@@ -25,38 +25,21 @@ z-index:-1;
 .header{
 text-align:center;
 padding-top:40px;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:10px;
-}
-
-.logoH {
-width:50px;
-height:50px;
-background:#0ff;
-font-weight:bold;
-font-size:36px;
-display:flex;
-justify-content:center;
-align-items:center;
-border-radius:8px;
-text-shadow:0 0 20px #0ff;
 }
 
 .logoText{
-font-size:48px;
+font-size:60px;
 font-weight:700;
 background:linear-gradient(90deg,#4cc9f0,#7209b7);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
-text-shadow:0 0 30px rgba(100,160,255,.9);
+text-shadow:0 0 35px rgba(100,160,255,.9);
 }
 
 .subtitle{
-font-size:20px;
+font-size:24px;
 opacity:.85;
-margin-top:6px;
+margin-top:10px;
 }
 
 /* Main Panel */
@@ -79,10 +62,10 @@ margin-bottom:40px;
 
 button{
 flex:1;
-padding:16px;
+padding:18px;
 border:none;
 border-radius:12px;
-font-size:16px;
+font-size:18px;
 font-weight:600;
 cursor:pointer;
 background:linear-gradient(90deg,#4361ee,#7209b7);
@@ -105,22 +88,24 @@ gap:20px;
 
 .card{
 background:rgba(255,255,255,.05);
-padding:25px;
+padding:30px;
 border-radius:15px;
 backdrop-filter:blur(10px);
 }
 
 .card h3{
+font-size:22px;
 color:#9fb7ff;
-margin-bottom:15px;
+margin-bottom:20px;
 }
 
 /* Case Status */
 .status span{
 display:block;
-padding:6px;
+padding:8px;
 margin:5px 0;
 border-radius:6px;
+font-size:16px;
 color:#8fb6ff;
 }
 
@@ -133,7 +118,7 @@ box-shadow:0 0 15px rgba(130,130,255,.9);
 
 /* Metrics */
 .metric{
-font-size:40px;
+font-size:45px;
 font-weight:700;
 text-align:center;
 margin-top:10px;
@@ -148,12 +133,15 @@ color:#ff4d6d;
 
 <canvas id="auroraCanvas"></canvas>
 
+<!-- Background Water Sound -->
+<audio id="waterSound" autoplay loop>
+<source src="soft_water.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+
 <div class="header">
-<div class="logoH">H</div>
-<div>
 <div class="logoText">HybridAI</div>
 <div class="subtitle">Medical Chronology Builder & Analyzer</div>
-</div>
 </div>
 
 <div class="panel">
@@ -197,14 +185,14 @@ const ctx = canvas.getContext("2d");
 let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
 
-// Ribbons for aurora
+// Aurora ribbons
 const ribbons = [];
 for(let i=0;i<6;i++){
 ribbons.push({
 y: Math.random()*height*0.5,
-amplitude: 50 + Math.random()*50,
-wavelength: 200 + Math.random()*200,
-speed: 0.0005 + Math.random()*0.0005,
+amplitude: 80 + Math.random()*40,
+wavelength: 250 + Math.random()*200,
+speed: 0.0001 + Math.random()*0.00015, // very slow
 phase: Math.random()*Math.PI*2,
 color1: `rgba(76,201,240,0.15)`,
 color2: `rgba(114,9,183,0.15)`,
@@ -214,12 +202,11 @@ color3: `rgba(0,255,204,0.15)`
 
 let pulse = 0;
 
-// Draw aurora ribbons and reflection
 function drawAurora(){
 ctx.clearRect(0,0,width,height);
 
-// Draw aurora ribbons
 ribbons.forEach(r=>{
+// Aurora ribbons
 ctx.beginPath();
 for(let x=0;x<width;x++){
 let y = r.y + Math.sin((x/r.wavelength)+r.phase + Date.now()*r.speed)*r.amplitude;
@@ -235,10 +222,10 @@ ctx.lineWidth = 60;
 ctx.lineCap = 'round';
 ctx.stroke();
 
-// Draw reflected ribbon
+// Reflection (soft)
 ctx.beginPath();
 for(let x=0;x<width;x++){
-let y = height*0.75 + (r.y + Math.sin((x/r.wavelength)+r.phase + Date.now()*r.speed)*r.amplitude)*0.3;
+let y = height*0.75 + (r.y + Math.sin((x/r.wavelength)+r.phase + Date.now()*r.speed)*r.amplitude)*0.25;
 if(x===0) ctx.moveTo(x,y);
 else ctx.lineTo(x,y);
 }
@@ -252,24 +239,30 @@ ctx.lineCap = 'round';
 ctx.stroke();
 });
 
-// Reduce pulse gradually
 pulse *= 0.95;
-
 requestAnimationFrame(drawAurora);
 }
 
 drawAurora();
 
-// Resize canvas
 window.addEventListener('resize', ()=>{
 width = canvas.width = window.innerWidth;
 height = canvas.height = window.innerHeight;
 });
 
-// ===== Buttons logic =====
+// ===== Button Logic =====
 let uploadedCases = 5;
+
+// Setup water audio
+const waterAudio = document.getElementById('waterSound');
+waterAudio.volume = 0.15; // soft and subtle
+
 function handleClick(action){
-pulse = 1; // trigger gentle aurora pulse
+pulse = 1; // gentle aurora pulse
+// Optional: slightly increase water volume on pulse
+waterAudio.volume = 0.2;
+setTimeout(()=>waterAudio.volume = 0.15, 800);
+
 switch(action){
 case 'upload':
 uploadedCases++;
