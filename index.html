@@ -130,12 +130,13 @@ margin-top:10px;
 color:#dbe9ff;
 text-shadow:0 0 15px rgba(120,150,255,0.4);
 }
+/* Highlight Needs Attention */
 .subtext{
-font-size:18px;
-opacity:0.9;
+font-size:20px;
+font-weight:600;
+color:#ff4d6d;
+text-shadow:0 0 12px rgba(255,80,100,0.7);
 margin-top:8px;
-color:#cfdfff;
-text-shadow:0 0 4px rgba(120,150,255,0.3);
 }
 </style>
 </head>
@@ -145,7 +146,6 @@ text-shadow:0 0 4px rgba(120,150,255,0.3);
 
 <canvas id="auroraCanvas"></canvas>
 
-<!-- Ocean Wave Sound -->
 <audio id="oceanSound" autoplay loop>
 <source src="soft_ocean_waves.mp3" type="audio/mpeg">
 Your browser does not support the audio element.
@@ -186,7 +186,7 @@ Your browser does not support the audio element.
 </div>
 
 <script>
-// ---------- Aurora Ribbons with Pulse ----------
+// ---------- Aurora Ribbons ----------
 const canvas=document.getElementById("auroraCanvas");
 const ctx=canvas.getContext("2d");
 let width=canvas.width=window.innerWidth;
@@ -194,8 +194,12 @@ let height=canvas.height=window.innerHeight;
 
 class Ribbon{
 constructor(color, amplitude, speed, offsetX=0){
-this.color=color; this.amplitude=amplitude; this.baseAmplitude=amplitude;
-this.speed=speed; this.offset=Math.random()*1000; this.offsetX=offsetX;
+this.color=color;
+this.amplitude=amplitude;
+this.baseAmplitude=amplitude;
+this.speed=speed;
+this.offset=Math.random()*1000;
+this.offsetX=offsetX;
 }
 draw(time){
 let amp=this.amplitude;
@@ -212,18 +216,27 @@ ctx.fillStyle=this.color;
 ctx.shadowBlur=100; ctx.shadowColor=this.color;
 ctx.fill(); ctx.shadowBlur=0;
 }
-pulse(strength=15){ this.amplitude=this.baseAmplitude+strength; setTimeout(()=>{this.amplitude=this.baseAmplitude;},300);}
+pulse(strength=15){
+this.amplitude=this.baseAmplitude+strength;
+setTimeout(()=>{this.amplitude=this.baseAmplitude;},300);
+}
 }
 
+// Ribbons spaced apart and flowing at different speeds
 const ribbons=[
-new Ribbon("rgba(114,9,183,0.4)",50,0.00045),
-new Ribbon("rgba(67,97,238,0.38)",60,0.0004,100),
-new Ribbon("rgba(76,201,240,0.3)",55,0.00035,200),
-new Ribbon("rgba(114,9,183,0.25)",70,0.0005,300)
+new Ribbon("rgba(114,9,183,0.4)",50,0.00045,0),
+new Ribbon("rgba(67,97,238,0.38)",60,0.00025,300),
+new Ribbon("rgba(76,201,240,0.3)",55,0.00035,600),
+new Ribbon("rgba(114,9,183,0.25)",70,0.0005,900)
 ];
 
-function animate(time=0){ ctx.clearRect(0,0,width,height); ribbons.forEach(r=>r.draw(time)); requestAnimationFrame(animate);}
+function animate(time=0){
+ctx.clearRect(0,0,width,height);
+ribbons.forEach(r=>r.draw(time));
+requestAnimationFrame(animate);
+}
 animate();
+
 window.addEventListener('resize', ()=>{ width=canvas.width=window.innerWidth; height=canvas.height=window.innerHeight; });
 
 // ---------- Case Status ----------
