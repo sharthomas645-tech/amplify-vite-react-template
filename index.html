@@ -229,23 +229,26 @@ let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
 
 class Ribbon {
-constructor(colors, amplitude, speed, offsetX=0){
+constructor(colors, baseY, amplitude, speed, offsetX=0){
 this.colors = colors;
+this.baseY = baseY;
 this.amplitude = amplitude;
 this.baseAmplitude = amplitude;
 this.speed = speed;
 this.offset = Math.random()*1000;
 this.offsetX = offsetX;
 }
+
 draw(time){
 const grad = ctx.createLinearGradient(0,0,0,height);
 grad.addColorStop(0, this.colors[0]);
 grad.addColorStop(0.5, this.colors[1]);
 grad.addColorStop(1, this.colors[2]);
+
 ctx.beginPath();
-ctx.moveTo(0,height/2);
-for(let x=0;x<=width;x+=2){
-let y = height/2 + Math.sin((x+this.offsetX)*0.01 + time*this.speed + this.offset) * this.amplitude;
+ctx.moveTo(0,this.baseY);
+for(let x=0; x<=width; x+=2){
+let y = this.baseY + Math.sin((x + this.offsetX)*0.01 + time*this.speed + this.offset) * this.amplitude;
 ctx.lineTo(x,y);
 }
 ctx.lineTo(width,height);
@@ -257,17 +260,20 @@ ctx.shadowColor = "rgba(255,255,255,0.2)";
 ctx.fill();
 ctx.shadowBlur = 0;
 }
+
 pulse(strength=15){
 this.amplitude = this.baseAmplitude + strength;
 setTimeout(()=>{this.amplitude = this.baseAmplitude;}, 300);
 }
 }
 
+// Overlapping ribbons with different vertical positions
 const ribbons = [
-new Ribbon(["rgba(114,9,183,0.4)","rgba(67,97,238,0.35)","rgba(76,201,240,0.3)"],50,0.00045,0),
-new Ribbon(["rgba(67,97,238,0.38)","rgba(76,201,240,0.32)","rgba(114,9,183,0.3)"],60,0.00025,300),
-new Ribbon(["rgba(76,201,240,0.35)","rgba(114,9,183,0.3)","rgba(67,97,238,0.28)"],55,0.00035,600),
-new Ribbon(["rgba(114,9,183,0.25)","rgba(67,97,238,0.3)","rgba(76,201,240,0.27)"],70,0.0005,900)
+new Ribbon(["rgba(114,9,183,0.4)","rgba(67,97,238,0.35)","rgba(76,201,240,0.3)"], height*0.2, 50, 0.00045, 0),
+new Ribbon(["rgba(67,97,238,0.38)","rgba(76,201,240,0.32)","rgba(114,9,183,0.3)"], height*0.35, 60, 0.00025, 200),
+new Ribbon(["rgba(76,201,240,0.35)","rgba(114,9,183,0.3)","rgba(67,97,238,0.28)"], height*0.5, 55, 0.00035, 500),
+new Ribbon(["rgba(114,9,183,0.25)","rgba(67,97,238,0.3)","rgba(76,201,240,0.27)"], height*0.65, 70, 0.0005, 800),
+new Ribbon(["rgba(76,201,240,0.3)","rgba(67,97,238,0.28)","rgba(114,9,183,0.25)"], height*0.8, 60, 0.0004, 1000)
 ];
 
 function animate(time=0){
@@ -280,7 +286,11 @@ animate();
 window.addEventListener('resize',()=>{
 width = canvas.width = window.innerWidth;
 height = canvas.height = window.innerHeight;
-ribbons.forEach((r,i)=>{ r.amplitude = (height/20)+i*5; r.offsetX=i*300; });
+ribbons.forEach((r,i)=>{
+r.baseY = height*0.2 + i*height*0.15;
+r.amplitude = (height/20)+i*5;
+r.offsetX = i*300;
+});
 });
 
 // ---------- Case Status ----------
