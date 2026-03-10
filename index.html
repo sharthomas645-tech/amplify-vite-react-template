@@ -65,8 +65,9 @@ background-size: 800% 800%;
 -webkit-text-fill-color: transparent;
 animation: subtitleGradient1 25s ease infinite;
 }
-.subtitle.quote{
+.subtitle.motto{
 font-size:22px;
+font-weight:bold;
 background: linear-gradient(270deg,#7209b7,#4cc9f0,#00ff99,#4361ee);
 background-size: 800% 800%;
 -webkit-background-clip: text;
@@ -188,7 +189,7 @@ margin-top:8px;
 <div class="header">
 <div class="logoText">HybridAI</div>
 <div class="subtitle main" id="subtitleText">Medical Chronology Builder & Analyzer</div>
-<div class="subtitle quote">“We Make It Make Sense”</div>
+<div class="subtitle motto">We Make It Make Sense</div>
 </div>
 
 <div class="panel">
@@ -222,52 +223,51 @@ margin-top:8px;
 
 <script>
 // ---------- Aurora Ribbons ----------
-const canvas=document.getElementById("auroraCanvas");
-const ctx=canvas.getContext("2d");
-let width=canvas.width=window.innerWidth;
-let height=canvas.height=window.innerHeight;
+const canvas = document.getElementById("auroraCanvas");
+const ctx = canvas.getContext("2d");
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
 
-class Ribbon{
-constructor(color, amplitude, speed, offsetX=0){
-this.color=color;
-this.amplitude=amplitude;
-this.baseAmplitude=amplitude;
-this.speed=speed;
-this.offset=Math.random()*1000;
-this.offsetX=offsetX;
+class Ribbon {
+constructor(colors, amplitude, speed, offsetX=0){
+this.colors = colors;
+this.amplitude = amplitude;
+this.baseAmplitude = amplitude;
+this.speed = speed;
+this.offset = Math.random()*1000;
+this.offsetX = offsetX;
 }
 draw(time){
-let amp=this.amplitude;
+const grad = ctx.createLinearGradient(0,0,0,height);
+grad.addColorStop(0, this.colors[0]);
+grad.addColorStop(0.5, this.colors[1]);
+grad.addColorStop(1, this.colors[2]);
 ctx.beginPath();
 ctx.moveTo(0,height/2);
 for(let x=0;x<=width;x+=2){
-let y=height/2 + Math.sin((x+this.offsetX)*0.01 + time*this.speed + this.offset)*amp;
+let y = height/2 + Math.sin((x+this.offsetX)*0.01 + time*this.speed + this.offset) * this.amplitude;
 ctx.lineTo(x,y);
 }
 ctx.lineTo(width,height);
 ctx.lineTo(0,height);
 ctx.closePath();
-ctx.fillStyle=this.color;
-ctx.shadowBlur=100; ctx.shadowColor=this.color;
-ctx.fill(); ctx.shadowBlur=0;
+ctx.fillStyle = grad;
+ctx.shadowBlur = 100;
+ctx.shadowColor = "rgba(255,255,255,0.2)";
+ctx.fill();
+ctx.shadowBlur = 0;
 }
 pulse(strength=15){
-this.amplitude=this.baseAmplitude+strength;
-setTimeout(()=>{this.amplitude=this.baseAmplitude;},300);
-}
-shiftHue(amount){
-this.color=this.color.replace(/rgba\((\d+),(\d+),(\d+),([0-9.]+)\)/, (m,r,g,b,a)=>{
-r=(parseInt(r)+amount)%256; g=(parseInt(g)+amount)%256; b=(parseInt(b)+amount)%256;
-return `rgba(${r},${g},${b},${a})`;
-});
+this.amplitude = this.baseAmplitude + strength;
+setTimeout(()=>{this.amplitude = this.baseAmplitude;}, 300);
 }
 }
 
-const ribbons=[
-new Ribbon("rgba(114,9,183,0.4)",50,0.00045,0),
-new Ribbon("rgba(67,97,238,0.38)",60,0.00025,300),
-new Ribbon("rgba(76,201,240,0.3)",55,0.00035,600),
-new Ribbon("rgba(114,9,183,0.25)",70,0.0005,900)
+const ribbons = [
+new Ribbon(["rgba(114,9,183,0.4)","rgba(67,97,238,0.35)","rgba(76,201,240,0.3)"],50,0.00045,0),
+new Ribbon(["rgba(67,97,238,0.38)","rgba(76,201,240,0.32)","rgba(114,9,183,0.3)"],60,0.00025,300),
+new Ribbon(["rgba(76,201,240,0.35)","rgba(114,9,183,0.3)","rgba(67,97,238,0.28)"],55,0.00035,600),
+new Ribbon(["rgba(114,9,183,0.25)","rgba(67,97,238,0.3)","rgba(76,201,240,0.27)"],70,0.0005,900)
 ];
 
 function animate(time=0){
@@ -277,10 +277,10 @@ requestAnimationFrame(animate);
 }
 animate();
 
-window.addEventListener('resize', ()=>{
-width=canvas.width=window.innerWidth;
-height=canvas.height=window.innerHeight;
-ribbons.forEach((r,i) => { r.amplitude = (height/20)+i*5; r.offsetX = i*300; });
+window.addEventListener('resize',()=>{
+width = canvas.width = window.innerWidth;
+height = canvas.height = window.innerHeight;
+ribbons.forEach((r,i)=>{ r.amplitude = (height/20)+i*5; r.offsetX=i*300; });
 });
 
 // ---------- Case Status ----------
@@ -291,10 +291,7 @@ function updateStatus(index){ statusSpans.forEach((span,i)=>span.classList.toggl
 
 // ---------- Subtitle Pulse ----------
 const subtitle=document.getElementById('subtitleText');
-function pulseSubtitle(){
-subtitle.classList.add('pulse');
-setTimeout(()=>subtitle.classList.remove('pulse'),300);
-}
+function pulseSubtitle(){ subtitle.classList.add('pulse'); setTimeout(()=>subtitle.classList.remove('pulse'),300); }
 
 // ---------- API Endpoints ----------
 const apiEndpoints={
@@ -322,11 +319,9 @@ document.getElementById('casesUploaded').innerText=uploadedCases;
 currentStatusIndex=0; updateStatus(currentStatusIndex);
 alert(`PDF uploaded: ${file.name}`);
 ribbons.forEach(r=>r.pulse());
-ribbons.forEach(r=>r.shiftHue(20));
 pulseSubtitle();
 oceanSound.volume=0.25; setTimeout(()=>oceanSound.volume=0.15,500);
 
-// Update High-Risk Alerts from API response
 if(result.highRiskCount!==undefined){
 document.getElementById('highRisk').innerText=result.highRiskCount;
 }
@@ -343,7 +338,6 @@ const result=await response.json();
 if(result.success){
 alert("Chronology built successfully!");
 ribbons.forEach(r=>r.pulse());
-ribbons.forEach(r=>r.shiftHue(15));
 pulseSubtitle();
 oceanSound.volume=0.25; setTimeout(()=>oceanSound.volume=0.15,500);
 
@@ -363,7 +357,6 @@ const result=await response.json();
 if(result.success){
 alert("RN Review request sent!");
 ribbons.forEach(r=>r.pulse());
-ribbons.forEach(r=>r.shiftHue(10));
 pulseSubtitle();
 oceanSound.volume=0.25; setTimeout(()=>oceanSound.volume=0.15,500);
 
@@ -384,7 +377,6 @@ const url=window.URL.createObjectURL(blob);
 const a=document.createElement("a"); a.href=url; a.download="exported_files.zip";
 document.body.appendChild(a); a.click(); a.remove();
 ribbons.forEach(r=>r.pulse());
-ribbons.forEach(r=>r.shiftHue(25));
 pulseSubtitle();
 oceanSound.volume=0.25; setTimeout(()=>oceanSound.volume=0.15,500);
 } catch(err){ console.error(err); alert("Error exporting files."); }
@@ -395,6 +387,7 @@ document.getElementById('uploadBtn').addEventListener('click',()=>fileInput.clic
 document.getElementById('buildChronBtn').addEventListener('click',callBuildChronology);
 document.getElementById('rnReviewBtn').addEventListener('click',callRNReview);
 document.getElementById('exportBtn').addEventListener('click',callExport);
+
 </script>
 </body>
 </html>
