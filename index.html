@@ -1,16 +1,99 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-   <script src="https://cdn.tailwindcss.com"></script>
+<head>
+<meta charset="UTF-8">
+<title>HybridAI Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body, html { margin:0; padding:0; font-family: Arial, sans-serif; }
+.swirl-bg {
+height: 100vh;
+background: linear-gradient(270deg, #7c3aed, #3b82f6, #9333ea, #2563eb, #7c3aed);
+background-size: 1200% 1200%;
+animation: swirl 120s ease infinite;
+}
+@keyframes swirl {
+0% { background-position: 0% 50%; }
+50% { background-position: 100% 50%; }
+100% { background-position: 0% 50%; }
+}
+.button-gradient {
+background: linear-gradient(to right, #7c3aed, #3b82f6, #9333ea);
+}
+</style>
+</head>
+<body>
+<div class="swirl-bg flex flex-col items-center py-12">
+<!-- Logo -->
+<div class="flex items-center space-x-4 mb-6">
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+<circle cx="24" cy="24" r="24" fill="url(#grad)"/>
+<defs>
+<linearGradient id="grad" x1="0" y1="0" x2="48" y2="48">
+<stop stop-color="#7c3aed"/>
+<stop offset="1" stop-color="#3b82f6"/>
+</linearGradient>
+</defs>
+</svg>
+<h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-blue-500 to-purple-700">HybridAI</h1>
+</div>
+
+<!-- Main Panel -->
+<div class="max-w-6xl w-full bg-white/90 backdrop-blur-md p-12 rounded-3xl shadow-2xl space-y-12">
+<h1 class="text-4xl font-bold text-purple-800 text-center">Medical Chronology Builder</h1>
+
+<!-- Buttons -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+<button class="button-gradient text-white py-4 rounded-2xl shadow-lg hover:scale-105 transition-transform font-semibold text-lg" onclick="addTimeline('Upload PDF')">Upload PDF</button>
+<button class="button-gradient text-white py-4 rounded-2xl shadow-lg hover:scale-105 transition-transform font-semibold text-lg" onclick="addTimeline('Build Chronology')">Build Chronology</button>
+<button class="button-gradient text-white py-4 rounded-2xl shadow-lg hover:scale-105 transition-transform font-semibold text-lg" onclick="addTimeline('RN Review Request')">RN Review Request</button>
+<button class="button-gradient text-white py-4 rounded-2xl shadow-lg hover:scale-105 transition-transform font-semibold text-lg" onclick="addTimeline('Export Files')">Export Files</button>
+</div>
+
+<!-- Status Panels -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Case Status -->
+<div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center">
+<h2 class="text-xl font-semibold text-purple-700 mb-4">Case Status</h2>
+<div class="space-y-1 text-gray-800 text-lg" id="case-status">
+<p class="font-bold">Uploaded</p>
+<p>Processing</p>
+<p>Under RN Review</p>
+<p>Ready for Export</p>
+</div>
+</div>
+
+<!-- High-Risk Alerts -->
+<div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center">
+<h2 class="text-xl font-semibold text-purple-700 mb-4">High-Risk Alerts</h2>
+<p class="text-4xl font-bold text-red-600" id="high-risk">2</p>
+</div>
+
+<!-- Cases Uploaded -->
+<div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center">
+<h2 class="text-xl font-semibold text-purple-700 mb-4">Cases Uploaded</h2>
+<p class="text-4xl font-bold text-gray-800" id="cases-uploaded">5</p>
+</div>
+</div>
+
+<!-- Timeline -->
+<div class="bg-white rounded-2xl shadow-lg p-6">
+<h2 class="text-xl font-semibold text-purple-700 mb-4">Chronology Timeline</h2>
+<div class="space-y-2" id="timeline">
+<div class="p-3 bg-gray-100 rounded-lg">No records uploaded yet</div>
+</div>
+</div>
+</div>
+</div>
 
 <script>
-tailwind.config = {
-theme: {
-extend: {
-colors: {
-brand: "#7C3AED"
-}
-}
-}
+const timelineDiv = document.getElementById('timeline');
+function addTimeline(text) {
+const div = document.createElement('div');
+div.className = 'p-3 bg-gray-100 rounded-lg';
+div.textContent = text;
+timelineDiv.appendChild(div);
 }
 </script>
+</body>
+</html>
