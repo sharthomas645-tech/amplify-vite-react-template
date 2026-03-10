@@ -2,84 +2,55 @@
 <html>
 <head>
 <title>HybridAI Dashboard</title>
-
 <style>
-
 body{
 margin:0;
 font-family:"Segoe UI",sans-serif;
 background:#020617;
 color:white;
-overflow-x:hidden;
+overflow:hidden;
 }
 
-/* Aurora Layer */
-
-.aurora{
+/* Aurora Canvas Layer */
+#auroraCanvas {
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
 z-index:-1;
-filter:blur(60px);
-opacity:.8;
-}
-
-.aurora span{
-position:absolute;
-width:60vw;
-height:60vh;
-border-radius:50%;
-animation:swirl 25s linear infinite;
-}
-
-.aurora span:nth-child(1){
-background:#4cc9f0;
-top:10%;
-left:10%;
-}
-
-.aurora span:nth-child(2){
-background:#7209b7;
-top:50%;
-left:40%;
-animation-duration:35s;
-}
-
-.aurora span:nth-child(3){
-background:#4361ee;
-top:30%;
-left:70%;
-animation-duration:45s;
-}
-
-@keyframes swirl{
-0%{
-transform:rotate(0deg) translateX(0px);
-}
-50%{
-transform:rotate(180deg) translateX(120px);
-}
-100%{
-transform:rotate(360deg) translateX(0px);
-}
 }
 
 /* Header */
-
 .header{
 text-align:center;
 padding-top:40px;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
 }
 
-.logo{
+.logoH {
+width:50px;
+height:50px;
+background:#0ff;
+font-weight:bold;
+font-size:36px;
+display:flex;
+justify-content:center;
+align-items:center;
+border-radius:8px;
+text-shadow:0 0 20px #0ff;
+}
+
+.logoText{
 font-size:48px;
 font-weight:700;
 background:linear-gradient(90deg,#4cc9f0,#7209b7);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
-text-shadow:0 0 25px rgba(100,160,255,.8);
+text-shadow:0 0 30px rgba(100,160,255,.9);
 }
 
 .subtitle{
@@ -89,7 +60,6 @@ margin-top:6px;
 }
 
 /* Main Panel */
-
 .panel{
 max-width:1100px;
 margin:40px auto;
@@ -101,7 +71,6 @@ box-shadow:0 15px 50px rgba(0,0,0,.6);
 }
 
 /* Buttons */
-
 .button-row{
 display:flex;
 gap:20px;
@@ -116,10 +85,8 @@ border-radius:12px;
 font-size:16px;
 font-weight:600;
 cursor:pointer;
-
 background:linear-gradient(90deg,#4361ee,#7209b7);
 color:white;
-
 box-shadow:0 0 15px rgba(120,120,255,.5);
 transition:.3s;
 }
@@ -130,7 +97,6 @@ box-shadow:0 0 30px rgba(150,130,255,1);
 }
 
 /* Cards */
-
 .cards{
 display:grid;
 grid-template-columns:1fr 1fr 1fr;
@@ -150,7 +116,6 @@ margin-bottom:15px;
 }
 
 /* Case Status */
-
 .status span{
 display:block;
 padding:6px;
@@ -160,7 +125,6 @@ color:#8fb6ff;
 }
 
 /* Active Status Glow */
-
 .active{
 background:linear-gradient(90deg,#4361ee,#7209b7);
 color:white;
@@ -168,7 +132,6 @@ box-shadow:0 0 15px rgba(130,130,255,.9);
 }
 
 /* Metrics */
-
 .metric{
 font-size:40px;
 font-weight:700;
@@ -179,59 +142,191 @@ margin-top:10px;
 .alert{
 color:#ff4d6d;
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="aurora">
-<span></span>
-<span></span>
-<span></span>
-</div>
+<canvas id="auroraCanvas"></canvas>
 
 <div class="header">
-<div class="logo">HybridAI</div>
+<div class="logoH">H</div>
+<div>
+<div class="logoText">HybridAI</div>
 <div class="subtitle">Medical Chronology Builder & Analyzer</div>
+</div>
 </div>
 
 <div class="panel">
 
 <div class="button-row">
-<button>Upload PDF</button>
-<button>Build Chronology</button>
-<button>RN Review Request</button>
-<button>Export Files</button>
+<button id="uploadBtn">Upload PDF</button>
+<button id="buildChronBtn">Build Chronology</button>
+<button id="rnReviewBtn">RN Review Request</button>
+<button id="exportBtn">Export Files</button>
 </div>
 
 <div class="cards">
 
 <div class="card">
 <h3>Case Status</h3>
-
 <div class="status">
 <span class="active">Uploaded</span>
 <span>Processing</span>
 <span>Under RN Review</span>
 <span>Ready for Export</span>
 </div>
-
 </div>
 
 <div class="card">
 <h3>High-Risk Alerts</h3>
-<div class="metric alert">2</div>
+<div class="metric alert" id="highRisk">2</div>
 </div>
 
 <div class="card">
 <h3>Cases Uploaded</h3>
-<div class="metric">5</div>
+<div class="metric" id="casesUploaded">5</div>
 </div>
 
 </div>
 
 </div>
 
+<script>
+// ===== Aurora Canvas =====
+const canvas = document.getElementById("auroraCanvas");
+const ctx = canvas.getContext("2d");
+
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+// Aurora ribbons
+const ribbons = [];
+for(let i=0;i<5;i++){
+ribbons.push({
+x: Math.random()*width,
+y: Math.random()*height,
+length: 400 + Math.random()*400,
+baseSpeed: 0.2 + Math.random()*0.5,
+speed: 0.2 + Math.random()*0.5,
+gradientColors: [
+"rgba(76,201,240,0.3)",
+"rgba(67,97,238,0.4)",
+"rgba(114,9,183,0.3)",
+"rgba(0,255,204,0.2)"
+],
+offset: Math.random()*Math.PI*2
+});
+}
+
+// Aurora particles (for burst effect)
+const particles = [];
+
+function spawnParticles(x,y){
+for(let i=0;i<15;i++){
+particles.push({
+x:x + (Math.random()*60-30),
+y:y + (Math.random()*60-30),
+vx:(Math.random()-0.5)*4,
+vy:(Math.random()-0.5)*2 - 1,
+alpha:1,
+size:3 + Math.random()*3,
+color:`rgba(${Math.floor(76+Math.random()*180)},${Math.floor(100+Math.random()*155)},${Math.floor(255)},0.8)`
+});
+}
+}
+
+// Aurora boost variables
+let boost = 0;
+
+function drawAurora(){
+ctx.clearRect(0,0,width,height);
+
+// Draw ribbons
+ribbons.forEach(r=>{
+const gradient = ctx.createLinearGradient(r.x, r.y, r.x+50, r.y+r.length);
+r.speed = r.baseSpeed + boost*0.7; // boost speed when triggered
+gradient.addColorStop(0, r.gradientColors[0]);
+gradient.addColorStop(0.3, r.gradientColors[1]);
+gradient.addColorStop(0.6, r.gradientColors[2]);
+gradient.addColorStop(1, r.gradientColors[3]);
+ctx.fillStyle = gradient;
+
+ctx.beginPath();
+const sway = Math.sin(Date.now()*0.002 + r.offset)*100*(1+boost); // sway stronger with boost
+ctx.ellipse(r.x + sway, r.y, 50, r.length, Math.sin(Date.now()*0.001+r.offset), 0, Math.PI*2);
+ctx.fill();
+
+r.y += r.speed;
+if(r.y - r.length > height) r.y = -100;
+});
+
+// Draw particles
+for(let i=particles.length-1;i>=0;i--){
+const p = particles[i];
+ctx.fillStyle = p.color.replace("0.8",p.alpha.toFixed(2));
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+ctx.fill();
+p.x += p.vx;
+p.y += p.vy;
+p.alpha -= 0.02;
+if(p.alpha <=0) particles.splice(i,1);
+}
+
+// reduce boost gradually
+boost *= 0.95;
+
+requestAnimationFrame(drawAurora);
+}
+
+drawAurora();
+
+// Resize handler
+window.addEventListener('resize', ()=>{
+width = canvas.width = window.innerWidth;
+height = canvas.height = window.innerHeight;
+});
+
+// ===== Button Logic =====
+let uploadedCases = 5;
+
+function handleButtonClick(action,x,y){
+boost = 1; // trigger aurora glow boost
+spawnParticles(x || width/2, y || height/2);
+
+switch(action){
+case 'upload':
+uploadedCases++;
+document.getElementById('casesUploaded').innerText = uploadedCases;
+alert('PDF uploaded! Total: '+uploadedCases);
+break;
+case 'chron':
+alert('Chronology built!');
+break;
+case 'rn':
+alert('RN Review Request sent!');
+break;
+case 'export':
+alert('Files ready for export!');
+break;
+}
+}
+
+// Attach button events with particle bursts
+function attachButton(id,action){
+const btn = document.getElementById(id);
+btn.addEventListener('click',(e)=>{
+const rect = btn.getBoundingClientRect();
+handleButtonClick(action, rect.left + rect.width/2, rect.top + rect.height/2);
+});
+}
+
+attachButton('uploadBtn','upload');
+attachButton('buildChronBtn','chron');
+attachButton('rnReviewBtn','rn');
+attachButton('exportBtn','export');
+
+</script>
 </body>
 </html>
