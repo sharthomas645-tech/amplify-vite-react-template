@@ -1,232 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>HybridAI – Chronology Builder & Analyzer</title>
+<title>HybridAI Dashboard</title>
 <style>
-
-/* ---------------- Body ---------------- */
+/* -------- Body -------- */
 body{
 margin:0;
-font-family:"Segoe UI", system-ui, sans-serif;
-background:#040915;
+font-family:"Segoe UI",sans-serif;
+overflow:hidden;
+background:#020617;
 color:white;
-overflow-x:hidden;
 }
 
-/* ---------------- Aurora ---------------- */
-.aurora-sky{
+/* -------- Aurora Canvas -------- */
+#auroraCanvas {
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
-overflow:hidden;
 z-index:-1;
-background:#040915;
 }
 
-.aurora-layer{
-position:absolute;
-width:200%;
-height:200%;
-filter:blur(80px);
-opacity:.45;
-mix-blend-mode:screen;
-}
-
-.aurora-purple{
-background:linear-gradient(120deg, transparent 20%, #7A5FFF 40%, transparent 60%);
-animation:auroraMove1 70s ease-in-out infinite alternate;
-}
-
-.aurora-blue{
-background:linear-gradient(140deg, transparent 25%, #3AA6FF 50%, transparent 70%);
-animation:auroraMove2 90s ease-in-out infinite alternate;
-}
-
-.aurora-green{
-background:linear-gradient(160deg, transparent 30%, #3DFFB3 55%, transparent 75%);
-animation:auroraMove3 110s ease-in-out infinite alternate;
-}
-
-@keyframes auroraMove1{
-0%{transform:translate(-20%,-10%) rotate(-5deg);}
-50%{transform:translate(10%,5%) rotate(5deg);}
-100%{transform:translate(-10%,10%) rotate(-3deg);}
-}
-
-@keyframes auroraMove2{
-0%{transform:translate(10%,-15%) rotate(6deg);}
-50%{transform:translate(-15%,5%) rotate(-6deg);}
-100%{transform:translate(5%,10%) rotate(4deg);}
-}
-
-@keyframes auroraMove3{
-0%{transform:translate(-10%,10%) rotate(-4deg);}
-50%{transform:translate(15%,-10%) rotate(6deg);}
-100%{transform:translate(-5%,5%) rotate(-5deg);}
-}
-
-/* ---------------- Layout ---------------- */
-.container{
-padding:40px;
+/* -------- Header -------- */
+.header{
 text-align:center;
-max-width:1200px;
-margin:auto;
+padding-top:40px;
 }
-
-/* ---------------- Header ---------------- */
-.title{
-font-size:44px;
+.logoText{
+font-size:60px;
 font-weight:700;
-letter-spacing:1px;
+background:linear-gradient(90deg,#4cc9f0,#7209b7);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+text-shadow:0 0 35px rgba(100,160,255,.9);
 }
-
 .subtitle{
-font-size:18px;
-opacity:.75;
-margin-bottom:50px;
+font-size:24px;
+opacity:.85;
+margin-top:10px;
 }
 
-/* ---------------- Buttons ---------------- */
-.actions{
+/* -------- Panel -------- */
+.panel{
+max-width:1100px;
+margin:40px auto;
+background:rgba(255,255,255,.05);
+padding:40px;
+border-radius:20px;
+backdrop-filter:blur(18px);
+box-shadow:0 15px 50px rgba(0,0,0,.6);
+}
+
+/* -------- Buttons -------- */
+.button-row{
 display:flex;
 justify-content:center;
 gap:20px;
-flex-wrap:wrap;
-margin-bottom:50px;
+margin-bottom:40px;
 }
-
 button{
-padding:16px 28px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,.2);
-background:rgba(255,255,255,.08);
-backdrop-filter:blur(10px);
-color:white;
-font-size:16px;
-cursor:pointer;
-transition:.3s;
-}
-
-button:hover{
-transform:translateY(-4px);
-box-shadow:0 0 25px rgba(122,95,255,.6);
-}
-
-/* ---------------- Cards ---------------- */
-.cards{
-display:flex;
-justify-content:center;
-gap:30px;
-flex-wrap:wrap;
-margin-bottom:50px;
-}
-
-.card{
-width:220px;
-padding:26px;
-border-radius:18px;
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.15);
-backdrop-filter:blur(12px);
-transition:.3s;
-}
-
-.card:hover{
-transform:scale(1.05);
-box-shadow:0 0 25px rgba(61,255,179,.3);
-}
-
-.card h3{
-margin:0;
-font-size:16px;
-opacity:.7;
-}
-
-.value{
-font-size:32px;
-margin-top:10px;
-font-weight:600;
-}
-
-/* ---------------- Upload ---------------- */
-.upload{
-margin:auto;
-width:540px;
-max-width:90%;
-padding:32px;
-border-radius:18px;
-border:2px dashed rgba(255,255,255,.2);
-background:rgba(255,255,255,.05);
-cursor:pointer;
-margin-bottom:50px;
-transition:.3s;
-font-size:16px;
-}
-
-.upload:hover{
-border-color:#7A5FFF;
-background:rgba(255,255,255,.06);
-}
-
-/* ---------------- Workspace ---------------- */
-.workspace{
-width:850px;
-max-width:95%;
-margin:auto;
-padding:32px;
-border-radius:20px;
-background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.12);
-backdrop-filter:blur(14px);
-text-align:left;
-}
-
-.workspace h2{
-margin-top:0;
-font-weight:500;
-}
-
-.log{
-margin-top:18px;
-height:180px;
-overflow:auto;
-font-size:14px;
-background:rgba(0,0,0,.4);
-padding:15px;
+flex:1;
+padding:18px;
+min-width:150px;
+border:none;
 border-radius:12px;
+font-size:18px;
+font-weight:600;
+cursor:pointer;
+background:linear-gradient(90deg,#4361ee,#7209b7);
+color:white;
+box-shadow:0 0 15px rgba(120,120,255,.5);
+transition:.3s;
+}
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 0 30px rgba(150,130,255,1);
 }
 
+/* -------- Cards -------- */
+.cards{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:20px;
+}
+.card{
+background:rgba(255,255,255,.05);
+padding:30px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+box-shadow:0 0 25px rgba(76,201,240,0.25);
+text-align:center;
+}
+.card h3{
+font-size:24px;
+color:#9fb7ff;
+margin-bottom:20px;
+}
+
+/* -------- Case Status -------- */
+.status span{
+display:block;
+padding:10px;
+margin:8px 0;
+border-radius:8px;
+font-size:18px;
+color:#8fb6ff;
+opacity:0.6;
+transition:.3s;
+}
+.active{
+background:linear-gradient(90deg,#4361ee,#7209b7);
+color:white;
+box-shadow:0 0 20px rgba(130,130,255,.9);
+opacity:1;
+}
+
+/* -------- Metrics -------- */
+.metric{
+font-size:50px;
+font-weight:700;
+text-align:center;
+margin-top:10px;
+}
+.alert{
+color:#ff4d6d;
+}
 </style>
 </head>
 <body>
 
 <!-- Aurora Background -->
-<div class="aurora-sky">
-<div class="aurora-layer aurora-purple"></div>
-<div class="aurora-layer aurora-blue"></div>
-<div class="aurora-layer aurora-green"></div>
+<canvas id="auroraCanvas"></canvas>
+
+<div class="header">
+<div class="logoText">HybridAI</div>
+<div class="subtitle">Medical Chronology Builder & Analyzer</div>
 </div>
 
-<div class="container">
-
-<div class="title">HybridAI</div>
-<div class="subtitle">Chronology Builder & Analyzer</div>
-
+<div class="panel">
 <!-- Action Buttons -->
-<div class="actions">
-<button onclick="buildChronology()">Build Chronology</button>
-<button onclick="rnReview()">Request RN Review</button>
-<button onclick="exportCase()">Ready for Export</button>
+<div class="button-row">
+<button id="uploadBtn">Upload PDF</button>
+<button id="buildChronBtn">Build Chronology</button>
+<button id="rnReviewBtn">RN Review Request</button>
+<button id="exportBtn">Export Files</button>
 </div>
 
-<!-- Status Cards -->
+<!-- Cards -->
 <div class="cards">
 <div class="card">
 <h3>Case Status</h3>
-<div id="status" class="value">Idle</div>
+<div class="status">
+<span class="active">Uploaded</span>
+<span>Processing</span>
+<span>RN Request In Progress</span>
+<span>Ready for Export</span>
+</div>
 </div>
 <div class="card">
-<
+<h3>High-Risk Alerts</h3>
+<div class="metric alert" id="highRisk">2</div>
+</div>
+<div class="card">
+<h3>Cases Uploaded</h3>
+<div class="metric" id="casesUploaded">5</div>
+</div>
+</div>
+</div>
+
+<script>
+// ===== Aurora Canvas Realistic =====
+const canvas = document.getElementById("auroraCanvas");
+const ctx = canvas.getContext("2d");
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+class AuroraLayer{
+constructor(color){
+this.color = color;
+this.points = [];
+this.offset = Math.random()*height*0.5;
+for(let i=0;i<=width;i+=20){
+this.points.push({x:i, y:Math.random()*200});
+}
+this.speed = 0.00003 + Math.random()*0.00003;
+}
+update(time, mouseX){
+this.points.forEach(p=>{
+p.y += Math.sin(time*0.0005 + p.x*0.01 + this.offset*0.01)*0.3;
+if(mouseX) p.y += (mouseX-width/2)*0.0002;
+});
+}
+draw(){
+ctx.beginPath();
+ctx.moveTo(0,height);
+this.points.forEach(p=>{
+ctx.lineTo(p.x, p.y+this.offset);
+});
+ctx.lineTo(width,height);
+ctx.closePath();
+ctx.fillStyle = this.color;
+ctx.fill();
+}
+}
+
+// Aurora layers with different vibrant hues
+const layers = [
+new AuroraLayer("rgba(114,9,183,0.3)"), // purple
+new AuroraLayer("rgba(76,201,240,0.25)"), // blue
+new AuroraLayer("rgba(0,255,204,0.2)") // green
+];
+
+let mouseX = 0;
+window.addEventListener('mousemove', e=>{mouseX = e.clientX;});
+
+function drawAurora(time=0){
+ctx.clearRect(0,0,width,height);
+layers.forEach(layer=>{
+layer.update(time, mouseX);
+layer.draw();
+});
+requestAnimationFrame(drawAurora);
+}
+drawAurora();
+
+window.addEventListener('resize', ()=>{
+width = canvas.width = window.innerWidth;
+height = canvas.height = window.innerHeight;
+layers.forEach(layer=>{
+layer.points = [];
+for(let i=0;i<=width;i+=20){
+layer.points.push({x:i, y:Math.random()*200});
+}
+});
+});
+
+// ===== Case Status and Buttons =====
+let uploadedCases = 5;
+const statusSpans = document.querySelectorAll('.status span');
+let currentStatusIndex = 0;
+
+function updateStatus(index){
+statusSpans.forEach((span,i)=>span.classList.toggle('active', i===index));
+}
+
+function handleClick(action){
+switch(action){
+case 'upload':
+uploadedCases++;
+document.getElementById('casesUploaded').innerText = uploadedCases;
+currentStatusIndex = 0;
+updateStatus(currentStatusIndex);
+break;
+case 'chron':
+currentStatusIndex = 1;
+updateStatus(currentStatusIndex);
+break;
+case 'rn':
+currentStatusIndex = 2;
+updateStatus(currentStatusIndex);
+break;
+case 'export':
+currentStatusIndex = 3;
+updateStatus(currentStatusIndex);
+break;
+}
+}
+
+// Attach click events
+['uploadBtn','buildChronBtn','rnReviewBtn','exportBtn'].forEach(id=>{
+document.getElementById(id).addEventListener('click', ()=>{
+handleClick(id.replace('Btn','').toLowerCase());
+});
+});
+</script>
+
+</body>
+</html>
