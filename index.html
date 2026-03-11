@@ -283,6 +283,7 @@ ribbons.forEach(r=>r.pulse()); pulseSubtitle(); pulseSound(0.15,500); updateHigh
 });
 document.getElementById('uploadBtn').addEventListener('click',()=>fileInput.click());
 
+
 // ---------------- Build ----------------
 async function callBuildChronology(){ try{ currentStatusIndex=1; updateStatus(currentStatusIndex); const response=await fetch(apiEndpoints.buildChron,{method:"POST",headers:{"Content-Type":"application/json"}}); const result=await response.json(); if(result.success){ alert("Chronology built successfully!"); ribbons.forEach(r=>r.pulse()); pulseSubtitle(); pulseSound(0.15,500); updateHighRiskAlerts(); } else alert("Error: "+result.message);} catch(err){ console.error(err); alert("Error calling Build Chronology API."); } }
 document.getElementById('buildChronBtn').addEventListener('click',callBuildChronology);
