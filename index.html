@@ -264,7 +264,17 @@ function pulseSubtitle(){ subtitle.classList.add('pulse'); setTimeout(()=>subtit
 
 // ---------------- File Upload (Fixed for IAM & Encryption) ----------------
 const fileInput = document.getElementById('fileInput');
+const uploadBtn = document.getElementById('uploadBtn');
 
+// 1. Direct binding for the button (Ensures the window opens)
+if (uploadBtn) {
+uploadBtn.addEventListener('click', (e) => {
+e.preventDefault();
+fileInput.click();
+});
+}
+
+// 2. The Upload Logic
 fileInput.addEventListener('change', async (event) => {
 const file = event.target.files[0];
 if (!file) return;
@@ -274,35 +284,58 @@ try {
 const payload = { fileName: file.name };
 
 const response = await fetch(apiEndpoints.upload, {
-method: "POST", // Your Lambda handler uses POST to generate the link
+method: "POST",
 headers: { "Content-Type": "application/json" },
 body: JSON.stringify(payload)
 });
 
-const { uploadUrl, key } = await response.json();
+const result = await response.json();
+const uploadUrl = result.uploadUrl;
 
 if (!uploadUrl) {
+console.error("Lambda did not return uploadUrl. Check Lambda logs.");
 throw new Error("Could not generate upload URL");
 }
 
-// STEP 2: Upload the actual file directly to S3 using the Presigned URL
-// THIS IS WHERE WE ADD THE ENCRYPTION HEADER FROM YOUR IAM POLICY
+// STEP 2: Upload raw file to S3 with the Required Encryption Header
 const s3Response = await fetch(uploadUrl, {
 method: "PUT",
-body: file, // Send the raw file, not Base64
+body: file,
 headers: {
 "Content-Type": "application/pdf",
-"x-amz-server-side-encryption": "AES256" // MANDATORY for your IAM Policy
+"x-amz-server-side-encryption": "AES256"
 }
 });
 
 if (s3Response.ok) {
+// Success Logic
 uploadedCases++;
-document.getElementById('casesUploaded').innerText = uploadedCases;
-currentStatusIndex = 0;
-updateStatus(currentStatusIndex);
+const counter = document.getElementById('casesUploaded');
+if (counter) counter.innerText = uploadedCases;
 
+if (typeof updateStatus === 'function') updateStatus(0);
 alert(`PDF uploaded successfully: ${file.name}`);
+
+// UI Effects (with safety checks)
+if (window.ribbons) ribbons.forEach(r => r.pulse());
+if (window.pulseSubtitle) pulseSubtitle();
+if (window.pulseSound) pulseSound(0.15, 500);
+} else {
+const errorText = await s3Response.text();
+console.error("S3 Error Details:", errorText);
+alert(`Upload failed: S3 rejected the file. Check IAM Policy.`);
+}
+
+} catch (err) {
+console.error("Upload process error:", err);
+alert("Error connecting to upload service.");
+} finally {
+// Reset input so the same file can be uploaded twice if needed
+fileInput.value = "";
+}
+});
+
+
 
 // UI Effects
 ribbons.forEach(r => r.pulse());
