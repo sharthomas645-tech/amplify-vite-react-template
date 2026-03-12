@@ -1,9 +1,10 @@
 import { defineFunction } from "@aws-amplify/backend";
+import { NodeVersion } from "@aws-amplify/backend-function";
 
 export const AttorneyUploadAPI = defineFunction({
   name: "AttorneyUploadAPI",
   entry: "./src/index.js",
-  runtime: 24,
+  runtime: NodeVersion.NODE_24,
   build: {
     esbuildConfig: {
       external: [
