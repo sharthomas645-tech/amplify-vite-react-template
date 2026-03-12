@@ -1,5 +1,4 @@
-$content = @'
-import { defineFunction } from "@aws-amplify/backend";
+﻿import { defineFunction } from "@aws-amplify/backend";
 
 export const AttorneyUploadAPI = defineFunction({
   name: "AttorneyUploadAPI",
@@ -12,6 +11,3 @@ export const AttorneyUploadAPI = defineFunction({
     FRONTEND_DOMAIN: "https://hybridaimedlegal.com",
   },
 });
-'@
-
-$content | Out-File -FilePath amplify/backend/functions/AttorneyUploadAPI/resource.ts -Encoding UTF8 -Force
