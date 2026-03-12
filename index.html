@@ -752,7 +752,7 @@ fileInput.addEventListener('change', async (event) => {
     const payload = { fileName: file.name };
 
     const handshakeResponse = await fetch(apiEndpoints.upload, {
-      method: "POST",
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
