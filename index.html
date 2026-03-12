@@ -223,20 +223,17 @@
 // CORRECT Cognito Configuration
 const COGNITO_DOMAIN = 'https://us-west-2o3tpxrglb.auth.us-west-2.amazoncognito.com';
 const CLIENT_ID = '5dm1etldt5tea0olbf4k8r67jh';
-const REDIRECT_URI = 'https://hybridaimedlegal.com'; // FIXED: removed /callback
-const SCOPES = 'email openid'; // FIXED: only email and openid (profile not configured)
+const REDIRECT_URI = 'https://hybridaimedlegal.com';
+const SCOPES = 'email openid';
 
-// Store authentication state
 let currentUser = null;
 
 console.log('HybridAI app initializing...');
 console.log('Cognito Domain:', COGNITO_DOMAIN);
 
-// Initialize on page load
 window.addEventListener('load', function() {
     console.log('Page loaded, setting up event listeners');
     
-    // Sign in button - DIRECT REDIRECT
     const signinBtn = document.getElementById('signinBtn');
     if (signinBtn) {
         signinBtn.onclick = function(e) {
@@ -244,14 +241,12 @@ window.addEventListener('load', function() {
             e.stopPropagation();
             console.log('Sign in button clicked - redirecting to Cognito');
             
-            // Direct OAuth redirect with CORRECT scopes
             const authUrl = `${COGNITO_DOMAIN}/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&scope=${encodeURIComponent(SCOPES)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
             console.log('Redirecting to:', authUrl);
             window.location.href = authUrl;
         };
     }
     
-    // Logout button
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.onclick = function(e) {
@@ -266,7 +261,6 @@ window.addEventListener('load', function() {
         };
     }
     
-    // Check for auth code in URL (callback from Cognito)
     const urlParams = new URLSearchParams(window.location.search);
     const authCode = urlParams.get('code');
     
@@ -274,7 +268,6 @@ window.addEventListener('load', function() {
         console.log('Auth code found in URL, exchanging for token...');
         exchangeCodeForToken(authCode);
     } else {
-        // Check if we have a stored token
         const storedToken = localStorage.getItem('access_token');
         if (storedToken) {
             console.log('Found stored token, showing dashboard');
@@ -285,7 +278,6 @@ window.addEventListener('load', function() {
         }
     }
     
-    // Setup Aurora canvas
     setupAuroraCanvas();
 });
 
@@ -300,7 +292,6 @@ function showDashboard() {
     initializeDashboard();
 }
 
-// Exchange authorization code for access token
 async function exchangeCodeForToken(code) {
     try {
         const response = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
@@ -322,7 +313,6 @@ async function exchangeCodeForToken(code) {
             localStorage.setItem('id_token', data.id_token);
             currentUser = data;
             
-            // Clean up URL
             window.history.replaceState({}, document.title, window.location.pathname);
             
             showDashboard();
@@ -336,14 +326,12 @@ async function exchangeCodeForToken(code) {
     }
 }
 
-// Initialize dashboard
 function initializeDashboard() {
     loadCases();
     setupFileUpload();
     setupButtons();
 }
 
-// Load cases
 async function loadCases() {
     try {
         const token = localStorage.getItem('access_token');
@@ -371,22 +359,44 @@ async function loadCases() {
     }
 }
 
-// Setup file upload
+// UPDATED: Setup file upload with detailed logging
 function setupFileUpload() {
     const fileInput = document.getElementById('fileInput');
     const uploadBtn = document.getElementById('uploadBtn');
 
     uploadBtn.addEventListener('click', () => {
+        console.log('Upload button clicked');
         fileInput.click();
     });
 
     fileInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
-        if (!file) return;
+        if (!file) {
+            console.warn('No file selected');
+            return;
+        }
+
+        console.log('=== FILE UPLOAD START ===');
+        console.log('File name:', file.name);
+        console.log('File size:', file.size, 'bytes');
+        console.log('File type:', file.type);
 
         try {
             const token = localStorage.getItem('access_token');
+            if (!token) {
+                console.error('No access token found in localStorage');
+                alert('Authentication error: No access token');
+                return;
+            }
+            console.log('✓ Access token found');
+
             const payload = { fileName: file.name };
+            console.log('Payload:', payload);
+
+            // STEP 1: Get presigned URL from API
+            console.log('\n--- STEP 1: Requesting presigned URL from API ---');
+            console.log('API Endpoint:', 'https://vicwyv5xoi.execute-api.us-west-2.amazonaws.com/prod/upload');
+            console.log('Method:', 'PUT');
 
             const handshakeResponse = await fetch('https://vicwyv5xoi.execute-api.us-west-2.amazonaws.com/prod/upload', {
                 method: 'PUT',
@@ -397,29 +407,89 @@ function setupFileUpload() {
                 body: JSON.stringify(payload)
             });
 
-            const result = await handshakeResponse.json();
+            console.log('API Response Status:', handshakeResponse.status, handshakeResponse.statusText);
+            console.log('API Response Headers:', {
+                'content-type': handshakeResponse.headers.get('content-type'),
+                'access-control-allow-origin': handshakeResponse.headers.get('access-control-allow-origin'),
+                'access-control-allow-credentials': handshakeResponse.headers.get('access-control-allow-credentials')
+            });
+
+            // Check if response is OK before parsing
+            if (!handshakeResponse.ok && handshakeResponse.status !== 201) {
+                console.error('API Response not OK. Status:', handshakeResponse.status);
+                const errorText = await handshakeResponse.text();
+                console.error('API Error Response:', errorText);
+                alert(`Upload failed: API returned status ${handshakeResponse.status}`);
+                return;
+            }
+
+            let result;
+            try {
+                result = await handshakeResponse.json();
+                console.log('✓ API Response parsed successfully');
+                console.log('API Response Body:', result);
+            } catch (parseErr) {
+                console.error('Failed to parse API response as JSON:', parseErr);
+                console.error('Response text:', await handshakeResponse.text());
+                alert('Upload failed: Could not parse API response');
+                return;
+            }
+
+            // STEP 2: Extract upload URL
+            console.log('\n--- STEP 2: Extracting upload URL ---');
             const uploadUrl = result.uploadUrl || result.url;
+            
+            if (!uploadUrl) {
+                console.error('No uploadUrl or url in response:', result);
+                alert('Upload failed: No upload URL returned from server');
+                return;
+            }
+            console.log('✓ Upload URL received:');
+            console.log('Upload URL:', uploadUrl);
+            console.log('URL Length:', uploadUrl.length);
+            console.log('URL starts with:', uploadUrl.substring(0, 50));
 
-            if (uploadUrl) {
-                const s3Response = await fetch(uploadUrl, {
-                    method: 'PUT',
-                    body: file,
-                    headers: { 'Content-Type': file.type || 'application/pdf' }
-                });
+            // STEP 3: Upload file to S3
+            console.log('\n--- STEP 3: Uploading file to S3 ---');
+            console.log('S3 Upload Method:', 'PUT');
+            console.log('S3 Upload Headers:', { 'Content-Type': file.type || 'application/pdf' });
 
-                if (s3Response.ok) {
-                    alert('File uploaded successfully!');
-                    loadCases();
-                }
+            const s3Response = await fetch(uploadUrl, {
+                method: 'PUT',
+                body: file,
+                headers: { 'Content-Type': file.type || 'application/pdf' }
+            });
+
+            console.log('S3 Response Status:', s3Response.status, s3Response.statusText);
+            console.log('S3 Response OK:', s3Response.ok);
+            console.log('S3 Response Headers:', {
+                'etag': s3Response.headers.get('etag'),
+                'x-amz-request-id': s3Response.headers.get('x-amz-request-id'),
+                'content-length': s3Response.headers.get('content-length')
+            });
+
+            if (s3Response.ok || s3Response.status === 200 || s3Response.status === 201) {
+                console.log('✓ File uploaded to S3 successfully!');
+                console.log('=== FILE UPLOAD COMPLETE ===\n');
+                alert('File uploaded successfully!');
+                loadCases();
+            } else {
+                console.error('S3 Upload failed with status:', s3Response.status);
+                const s3ErrorText = await s3Response.text();
+                console.error('S3 Error Response:', s3ErrorText);
+                alert(`S3 Upload failed with status ${s3Response.status}: ${s3ErrorText}`);
             }
         } catch (err) {
-            console.error('Upload failed:', err);
-            alert('Upload failed');
+            console.error('=== UPLOAD ERROR ===');
+            console.error('Error message:', err.message);
+            console.error('Error type:', err.name);
+            console.error('Error stack:', err.stack);
+            console.error('=== END ERROR ===\n');
+            alert(`Upload failed: ${err.message}`);
         }
     });
 }
 
-// Setup buttons
 function setupButtons() {
     document.getElementById('buildChronBtn').addEventListener('click', async () => {
         try {
@@ -479,7 +549,6 @@ function setupButtons() {
     });
 }
 
-// Aurora Canvas
 function setupAuroraCanvas() {
     const canvas = document.getElementById('auroraCanvas');
     const ctx = canvas.getContext('2d');
