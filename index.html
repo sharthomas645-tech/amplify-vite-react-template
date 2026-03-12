@@ -234,6 +234,27 @@ console.log('Cognito Domain:', COGNITO_DOMAIN);
 window.addEventListener('load', function() {
     console.log('Page loaded, setting up event listeners');
     
+    // Check for auth code FIRST before checking token
+    const urlParams = new URLSearchParams(window.location.search);
+    const authCode = urlParams.get('code');
+    
+    console.log('URL params:', { code: authCode ? 'present' : 'missing' });
+    
+    if (authCode) {
+        console.log('Auth code found in URL, exchanging for token...');
+        exchangeCodeForToken(authCode);
+    } else {
+        // No auth code, show login screen
+        console.log('No auth code, showing login screen');
+        showLoginScreen();
+        setupLoginButton();
+    }
+    
+    // Setup Aurora canvas
+    setupAuroraCanvas();
+});
+
+function setupLoginButton() {
     const signinBtn = document.getElementById('signinBtn');
     if (signinBtn) {
         signinBtn.onclick = function(e) {
@@ -241,45 +262,13 @@ window.addEventListener('load', function() {
             e.stopPropagation();
             console.log('Sign in button clicked - redirecting to Cognito');
             
+            // Redirect to Cognito login
             const authUrl = `${COGNITO_DOMAIN}/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&scope=${encodeURIComponent(SCOPES)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
             console.log('Redirecting to:', authUrl);
             window.location.href = authUrl;
         };
     }
-    
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.onclick = function(e) {
-            e.preventDefault();
-            console.log('Logout button clicked');
-            currentUser = null;
-            localStorage.clear();
-            sessionStorage.clear();
-            const logoutUrl = `${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
-            console.log('Redirecting to logout:', logoutUrl);
-            window.location.href = logoutUrl;
-        };
-    }
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const authCode = urlParams.get('code');
-    
-    if (authCode) {
-        console.log('Auth code found in URL, exchanging for token...');
-        exchangeCodeForToken(authCode);
-    } else {
-        const storedToken = localStorage.getItem('access_token');
-        if (storedToken) {
-            console.log('Found stored token, showing dashboard');
-            showDashboard();
-        } else {
-            console.log('No auth, showing login screen');
-            showLoginScreen();
-        }
-    }
-    
-    setupAuroraCanvas();
-});
+}
 
 function showLoginScreen() {
     document.getElementById('loginScreen').classList.remove('hidden');
@@ -294,6 +283,7 @@ function showDashboard() {
 
 async function exchangeCodeForToken(code) {
     try {
+        console.log('Exchanging code for token...');
         const response = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
             method: 'POST',
             headers: {
@@ -308,21 +298,29 @@ async function exchangeCodeForToken(code) {
         });
 
         const data = await response.json();
+        console.log('Token response status:', response.status);
+        console.log('Token response has access_token:', !!data.access_token);
+
         if (data.access_token) {
+            console.log('✓ Access token received, storing...');
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('id_token', data.id_token);
             currentUser = data;
             
+            // Clean up URL
             window.history.replaceState({}, document.title, window.location.pathname);
             
+            console.log('✓ Showing dashboard');
             showDashboard();
         } else {
             console.error('No access token in response:', data);
             showLoginScreen();
+            setupLoginButton();
         }
     } catch (err) {
         console.error('Token exchange error:', err);
         showLoginScreen();
+        setupLoginButton();
     }
 }
 
@@ -330,11 +328,33 @@ function initializeDashboard() {
     loadCases();
     setupFileUpload();
     setupButtons();
+    setupLogoutButton();
+}
+
+function setupLogoutButton() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('Logout button clicked');
+            currentUser = null;
+            localStorage.clear();
+            sessionStorage.clear();
+            const logoutUrl = `${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
+            console.log('Redirecting to logout:', logoutUrl);
+            window.location.href = logoutUrl;
+        };
+    }
 }
 
 async function loadCases() {
     try {
         const token = localStorage.getItem('access_token');
+        if (!token) {
+            console.warn('No token for loadCases');
+            return;
+        }
+
         const response = await fetch('https://vicwyv5xoi.execute-api.us-west-2.amazonaws.com/prod/cases', {
             method: 'GET',
             headers: {
@@ -342,6 +362,14 @@ async function loadCases() {
                 'Content-Type': 'application/json'
             }
         });
+
+        if (response.status === 401) {
+            console.error('Token expired or invalid, logging out');
+            localStorage.clear();
+            showLoginScreen();
+            setupLoginButton();
+            return;
+        }
 
         const result = await response.json();
         if (result.success && result.cases && result.cases.length > 0) {
@@ -359,7 +387,6 @@ async function loadCases() {
     }
 }
 
-// UPDATED: Setup file upload with detailed logging
 function setupFileUpload() {
     const fileInput = document.getElementById('fileInput');
     const uploadBtn = document.getElementById('uploadBtn');
@@ -385,7 +412,10 @@ function setupFileUpload() {
             const token = localStorage.getItem('access_token');
             if (!token) {
                 console.error('No access token found in localStorage');
-                alert('Authentication error: No access token');
+                alert('Authentication error: No access token. Please log in again.');
+                localStorage.clear();
+                showLoginScreen();
+                setupLoginButton();
                 return;
             }
             console.log('✓ Access token found');
@@ -408,13 +438,22 @@ function setupFileUpload() {
             });
 
             console.log('API Response Status:', handshakeResponse.status, handshakeResponse.statusText);
+
+            // Handle 401 Unauthorized
+            if (handshakeResponse.status === 401) {
+                console.error('Token is invalid or expired (401)');
+                localStorage.clear();
+                alert('Your session has expired. Please log in again.');
+                showLoginScreen();
+                setupLoginButton();
+                return;
+            }
+
             console.log('API Response Headers:', {
                 'content-type': handshakeResponse.headers.get('content-type'),
-                'access-control-allow-origin': handshakeResponse.headers.get('access-control-allow-origin'),
-                'access-control-allow-credentials': handshakeResponse.headers.get('access-control-allow-credentials')
+                'access-control-allow-origin': handshakeResponse.headers.get('access-control-allow-origin')
             });
 
-            // Check if response is OK before parsing
             if (!handshakeResponse.ok && handshakeResponse.status !== 201) {
                 console.error('API Response not OK. Status:', handshakeResponse.status);
                 const errorText = await handshakeResponse.text();
@@ -430,7 +469,6 @@ function setupFileUpload() {
                 console.log('API Response Body:', result);
             } catch (parseErr) {
                 console.error('Failed to parse API response as JSON:', parseErr);
-                console.error('Response text:', await handshakeResponse.text());
                 alert('Upload failed: Could not parse API response');
                 return;
             }
@@ -444,15 +482,11 @@ function setupFileUpload() {
                 alert('Upload failed: No upload URL returned from server');
                 return;
             }
-            console.log('✓ Upload URL received:');
-            console.log('Upload URL:', uploadUrl);
-            console.log('URL Length:', uploadUrl.length);
-            console.log('URL starts with:', uploadUrl.substring(0, 50));
+            console.log('✓ Upload URL received');
+            console.log('URL starts with:', uploadUrl.substring(0, 80));
 
             // STEP 3: Upload file to S3
             console.log('\n--- STEP 3: Uploading file to S3 ---');
-            console.log('S3 Upload Method:', 'PUT');
-            console.log('S3 Upload Headers:', { 'Content-Type': file.type || 'application/pdf' });
 
             const s3Response = await fetch(uploadUrl, {
                 method: 'PUT',
@@ -464,8 +498,7 @@ function setupFileUpload() {
             console.log('S3 Response OK:', s3Response.ok);
             console.log('S3 Response Headers:', {
                 'etag': s3Response.headers.get('etag'),
-                'x-amz-request-id': s3Response.headers.get('x-amz-request-id'),
-                'content-length': s3Response.headers.get('content-length')
+                'x-amz-request-id': s3Response.headers.get('x-amz-request-id')
             });
 
             if (s3Response.ok || s3Response.status === 200 || s3Response.status === 201) {
@@ -477,13 +510,12 @@ function setupFileUpload() {
                 console.error('S3 Upload failed with status:', s3Response.status);
                 const s3ErrorText = await s3Response.text();
                 console.error('S3 Error Response:', s3ErrorText);
-                alert(`S3 Upload failed with status ${s3Response.status}: ${s3ErrorText}`);
+                alert(`S3 Upload failed with status ${s3Response.status}`);
             }
         } catch (err) {
             console.error('=== UPLOAD ERROR ===');
             console.error('Error message:', err.message);
             console.error('Error type:', err.name);
-            console.error('Error stack:', err.stack);
             console.error('=== END ERROR ===\n');
             alert(`Upload failed: ${err.message}`);
         }
@@ -494,6 +526,10 @@ function setupButtons() {
     document.getElementById('buildChronBtn').addEventListener('click', async () => {
         try {
             const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('Please log in first');
+                return;
+            }
             const response = await fetch('https://huy6splpn3.execute-api.us-west-2.amazonaws.com/prod/build', {
                 method: 'POST',
                 headers: {
@@ -504,13 +540,17 @@ function setupButtons() {
             const result = await response.json();
             alert(result.success ? 'Chronology built!' : 'Error building chronology');
         } catch (err) {
-            alert('Error');
+            alert('Error: ' + err.message);
         }
     });
 
     document.getElementById('rnReviewBtn').addEventListener('click', async () => {
         try {
             const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('Please log in first');
+                return;
+            }
             const response = await fetch('https://rolkt59qj4.execute-api.us-west-2.amazonaws.com/prod/rn/request', {
                 method: 'POST',
                 headers: {
@@ -521,13 +561,17 @@ function setupButtons() {
             const result = await response.json();
             alert(result.success ? 'RN Review requested!' : 'Error');
         } catch (err) {
-            alert('Error');
+            alert('Error: ' + err.message);
         }
     });
 
     document.getElementById('exportBtn').addEventListener('click', async () => {
         try {
             const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('Please log in first');
+                return;
+            }
             const response = await fetch('https://g4r3dpjiu9.execute-api.us-west-2.amazonaws.com/prod/export', {
                 method: 'POST',
                 headers: {
@@ -544,7 +588,7 @@ function setupButtons() {
             a.click();
             a.remove();
         } catch (err) {
-            alert('Error exporting');
+            alert('Error: ' + err.message);
         }
     });
 }
