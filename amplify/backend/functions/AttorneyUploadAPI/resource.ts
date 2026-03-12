@@ -3,6 +3,7 @@ import { defineFunction } from "@aws-amplify/backend";
 export const AttorneyUploadAPI = defineFunction({
   name: "AttorneyUploadAPI",
   entry: "./src/index.ts",
+  runtime: 24,
   build: {
     esbuildConfig: {
       external: [
