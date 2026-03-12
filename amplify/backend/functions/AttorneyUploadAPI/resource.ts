@@ -3,7 +3,7 @@
 export const AttorneyUploadAPI = defineFunction({
   name: "AttorneyUploadAPI",
   entry: "./src/index.js",
-  runtime: 24,
+  runtime: 20,
   environment: {
     BUCKET_NAME: "medlegaldocuments-west2",
     VITE_UPLOAD_PREFIX: "uploads/",
