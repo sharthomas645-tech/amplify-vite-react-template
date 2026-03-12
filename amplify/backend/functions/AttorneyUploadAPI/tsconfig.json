@@ -1,9 +1,8 @@
-$content = @'
-{
+﻿{
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
-    "lib": ["ES2020", "dom"],
+    "lib": ["ES2020"],
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowJs": true,
@@ -11,6 +10,7 @@ $content = @'
     "noImplicitAny": false,
     "skipLibCheck": true,
     "types": ["node"],
+    "typeRoots": ["./node_modules/@types"],
     "esModuleInterop": true,
     "declaration": false,
     "noUnusedLocals": false,
@@ -20,6 +20,3 @@ $content = @'
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.test.ts"]
 }
-'@
-
-$content | Out-File -FilePath amplify/backend/functions/AttorneyUploadAPI/tsconfig.json -Encoding UTF8 -Force
