@@ -177,13 +177,13 @@
     <div class="login-logo">HybridAI</div>
     <div class="login-subtitle">Medical Chronology Builder & Analyzer</div>
     <div class="login-subtitle">We Make It Make Sense</div>
-    <button class="login-btn" id="signinBtn">Sign In with Cognito</button>
+    <button class="login-btn" id="signinBtn" type="button">Sign In with Cognito</button>
 </div>
 
 <!-- DASHBOARD SCREEN -->
 <div id="dashboardScreen" class="hidden">
     <div class="panel">
-        <button class="logout-btn" id="logoutBtn">Logout</button>
+        <button class="logout-btn" id="logoutBtn" type="button">Logout</button>
         
         <div class="logoText">HybridAI</div>
         <div class="subtitle">Medical Chronology Builder & Analyzer</div>
@@ -196,10 +196,10 @@
         </div>
 
         <div class="button-row">
-            <button id="uploadBtn">Click to Upload PDF</button>
-            <button id="buildChronBtn">Build Chronology</button>
-            <button id="rnReviewBtn">RN Review Request</button>
-            <button id="exportBtn">Export Files</button>
+            <button id="uploadBtn" type="button">Click to Upload PDF</button>
+            <button id="buildChronBtn" type="button">Build Chronology</button>
+            <button id="rnReviewBtn" type="button">RN Review Request</button>
+            <button id="exportBtn" type="button">Export Files</button>
         </div>
         
         <div class="cards">
@@ -225,27 +225,60 @@
 const userManager = new Oidc.UserManager({
     authority: 'https://cognito-idp.us-west-2.amazonaws.com/us-west-2_O3TpxRglB',
     client_id: '5dm1etldt5tea0olbf4k8r67jh',
-    redirect_uri: 'https://hybridaimedlegal.com',
+    redirect_uri: 'https://hybridaimedlegal.com/callback',
     response_type: 'code',
     scope: 'email openid profile',
     userStore: new Oidc.WebStorageStateStore({ prefix: 'oidc.client' })
 });
 
-// Check if user is already logged in
-userManager.getUser().then(user => {
-    if (user && !user.expired) {
-        showDashboard(user);
-    } else {
-        showLoginScreen();
-    }
-});
+console.log('UserManager initialized with redirect_uri:', 'https://hybridaimedlegal.com/callback');
 
-// Handle redirect from Cognito
-userManager.signinCallback().then(user => {
-    showDashboard(user);
-}).catch(err => {
-    console.error('Signin callback error:', err);
-    showLoginScreen();
+// Initialize on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, setting up event listeners');
+    
+    // Sign in button - using onclick
+    const signinBtn = document.getElementById('signinBtn');
+    if (signinBtn) {
+        signinBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('Sign in button clicked');
+            userManager.signinRedirect().catch(err => {
+                console.error('SigninRedirect error:', err);
+            });
+        };
+    }
+    
+    // Logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('Logout button clicked');
+            userManager.signoutRedirect();
+        };
+    }
+    
+    // Check if user is already logged in
+    userManager.getUser().then(user => {
+        console.log('Current user:', user);
+        if (user && !user.expired) {
+            showDashboard(user);
+        } else {
+            showLoginScreen();
+        }
+    }).catch(err => {
+        console.error('Error getting user:', err);
+        showLoginScreen();
+    });
+
+    // Handle redirect from Cognito
+    userManager.signinCallback().then(user => {
+        console.log('User signed in:', user);
+        showDashboard(user);
+    }).catch(err => {
+        console.error('Signin callback error:', err);
+    });
 });
 
 function showLoginScreen() {
@@ -258,16 +291,6 @@ function showDashboard(user) {
     document.getElementById('dashboardScreen').classList.remove('hidden');
     initializeDashboard();
 }
-
-// Sign in button
-document.getElementById('signinBtn').addEventListener('click', () => {
-    userManager.signinRedirect();
-});
-
-// Logout button
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    userManager.signoutRedirect();
-});
 
 // Initialize dashboard
 function initializeDashboard() {
