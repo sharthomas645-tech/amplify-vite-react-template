@@ -1,5 +1,4 @@
-cat > amplify/backend/functions/AttorneyUploadAPI/tsconfig.json << 'EOF'
-{
+﻿{
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
@@ -8,13 +7,15 @@ cat > amplify/backend/functions/AttorneyUploadAPI/tsconfig.json << 'EOF'
     "resolveJsonModule": true,
     "allowJs": true,
     "strict": false,
+    "noImplicitAny": false,
     "skipLibCheck": true,
     "types": ["node"],
     "esModuleInterop": true,
     "declaration": false,
-    "noImplicitAny": false
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.test.ts"]
 }
-EOF
