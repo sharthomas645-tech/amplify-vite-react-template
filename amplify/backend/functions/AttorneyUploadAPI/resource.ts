@@ -9,7 +9,8 @@ export const AttorneyUploadAPI = defineFunction({
       external: [
         "@aws-sdk/client-s3",
         "@aws-sdk/s3-request-presigner"
-      ]
+      ],
+      logLevel: "info"
     }
   },
   environment: {
