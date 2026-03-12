@@ -1,19 +1,9 @@
 import { defineFunction } from "@aws-amplify/backend";
-import { NodeVersion } from "@aws-amplify/backend-function";
 
 export const AttorneyUploadAPI = defineFunction({
   name: "AttorneyUploadAPI",
   entry: "./src/index.js",
-  runtime: NodeVersion.NODE_24,
-  build: {
-    esbuildConfig: {
-      external: [
-        "@aws-sdk/client-s3",
-        "@aws-sdk/s3-request-presigner"
-      ],
-      logLevel: "info"
-    }
-  },
+  runtime: "nodejs24.x",
   environment: {
     BUCKET_NAME: "medlegaldocuments-west2",
     VITE_UPLOAD_PREFIX: "uploads/",
