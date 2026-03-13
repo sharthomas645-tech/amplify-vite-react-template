@@ -23,7 +23,6 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
   color:var(--text-primary);overflow-x:hidden}
 
 #aurora-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
-#aurora-canvas-splash{position:fixed;inset:0;z-index:0;pointer-events:none}
 
 .page{position:relative;z-index:10;min-height:100vh}
 .hidden{display:none!important}
@@ -37,9 +36,10 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 .brand-section{text-align:center;animation:fadeInDown .8s ease both}
 @keyframes fadeInDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
 
-.hybrid-logo{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;justify-content:center}
+.hybrid-logo{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.5rem;justify-content:center;
+  flex-wrap:wrap}
 
-.logo-h-svg{width:120px;height:120px;flex-shrink:0;
+.logo-h-svg{width:100px;height:100px;flex-shrink:0;
   filter:drop-shadow(0 0 30px rgba(200,100,255,.8)) drop-shadow(0 0 60px rgba(59,130,246,.5));
   animation:logoGlow 4s ease-in-out infinite}
 
@@ -50,17 +50,17 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 
 .logo-text-section{display:flex;flex-direction:column;gap:.3rem;align-items:flex-start}
 
-.logo-text-hybrid{font-size:3.5rem;font-weight:900;line-height:1;letter-spacing:-2px;
+.logo-text-hybrid{font-size:2.8rem;font-weight:900;line-height:1;letter-spacing:-1px;
   background:linear-gradient(90deg,#ffffff 0%,#ffffff 60%,#22d3ee 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   filter:drop-shadow(0 0 15px rgba(34,211,238,.7))}
 
-.sub1{margin:0;font-size:1.3rem;font-weight:700;
+.sub1{margin:0;font-size:1.1rem;font-weight:700;
   background:linear-gradient(90deg,#60a5fa,#a855f7,#22d3ee);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   letter-spacing:.5px}
 
-.sub2{margin:0;font-size:.95rem;font-weight:600;
+.sub2{margin:0;font-size:.85rem;font-weight:600;
   background:linear-gradient(90deg,#22d3ee,#a855f7,#3b82f6);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   letter-spacing:.1em;text-transform:uppercase}
@@ -114,7 +114,7 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 
 @keyframes auroraFlow{0%{background-position:0% center}100%{background-position:300% center}}
 
-.splash-logo-svg{width:300px;height:300px;
+.splash-logo-svg{width:250px;height:250px;
   filter:drop-shadow(0 0 60px rgba(80,160,255,1)) drop-shadow(0 0 100px rgba(168,85,247,.7));
   animation:splashLogoPulse 2.5s ease-in-out infinite;margin-bottom:1.5rem}
 
@@ -123,15 +123,15 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
   50%{filter:drop-shadow(0 0 80px rgba(96,165,250,1)) drop-shadow(0 0 130px rgba(168,85,247,.9));transform:scale(1.1)}
 }
 
-.splash-title{margin:0;font-size:clamp(3.5rem,12vw,6rem);font-weight:900;text-align:center;
+.splash-title{margin:0;font-size:clamp(3.5rem,12vw,5rem);font-weight:900;text-align:center;
   letter-spacing:-2px;line-height:1;margin-bottom:.8rem;
   text-shadow:0 0 40px rgba(96,165,250,.6),0 0 60px rgba(168,85,247,.4)}
 
-.splash-subtitle-1{margin:0;font-size:clamp(1.2rem,3.5vw,1.8rem);font-weight:700;text-align:center;
+.splash-subtitle-1{margin:0;font-size:clamp(1.2rem,3.5vw,1.6rem);font-weight:700;text-align:center;
   letter-spacing:.03em;max-width:700px;line-height:1.4;
   text-shadow:0 0 25px rgba(96,165,250,.5),0 0 40px rgba(168,85,247,.35)}
 
-.splash-subtitle-2{margin:0;font-size:clamp(1rem,3vw,1.5rem);font-weight:800;text-align:center;
+.splash-subtitle-2{margin:0;font-size:clamp(1rem,3vw,1.3rem);font-weight:800;text-align:center;
   letter-spacing:.1em;text-transform:uppercase;margin-top:.8rem;
   text-shadow:0 0 30px rgba(96,165,250,.6),0 0 50px rgba(168,85,247,.4);font-style:italic}
 
@@ -150,7 +150,7 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 }
 
 /* ══════════════════════════════════════════════════════
-   DASHBOARD - SOPHISTICATED ATTORNEY WORKSPACE
+   DASHBOARD
 ══════════════════════════════════════════════════════ */
 #dashboard-page{display:flex;flex-direction:column;position:relative;min-height:100vh}
 
@@ -314,40 +314,60 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 <div id="login-page" class="page">
   <div class="brand-section">
     <div class="hybrid-logo">
-      <svg class="logo-h-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <svg class="logo-h-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="hGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1"/>
-            <stop offset="20%" style="stop-color:#d946ef;stop-opacity:1"/>
-            <stop offset="40%" style="stop-color:#a855f7;stop-opacity:1"/>
-            <stop offset="60%" style="stop-color:#3b82f6;stop-opacity:1"/>
-            <stop offset="80%" style="stop-color:#22d3ee;stop-opacity:1"/>
+          <linearGradient id="leftRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#f472b6;stop-opacity:1"/>
+            <stop offset="50%" style="stop-color:#ec4899;stop-opacity:1"/>
+            <stop offset="100%" style="stop-color:#be185d;stop-opacity:1"/>
+          </linearGradient>
+          <linearGradient id="rightRibbon" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#67e8f9;stop-opacity:1"/>
+            <stop offset="50%" style="stop-color:#22d3ee;stop-opacity:1"/>
             <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1"/>
           </linearGradient>
-          <filter id="hGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <filter id="ribbonGlow">
+            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+          <filter id="shadow">
+            <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.3"/>
+          </filter>
         </defs>
         
-        <!-- Left ribbon (pink to purple) -->
-        <path d="M 20 25 Q 15 30 15 50 Q 15 70 25 80 Q 28 82 30 80 Q 25 72 25 50 Q 25 35 32 28 Z" 
-              fill="url(#hGradient)" filter="url(#hGlow)" opacity="0.95"/>
+        <path d="M 45 45 Q 48 50 48 70 Q 48 90 42 105 Q 50 100 52 75 Q 52 55 50 48 Z" 
+              fill="#000000" opacity="0.15" filter="url(#shadow)"/>
+        <path d="M 115 45 Q 112 50 112 70 Q 112 90 118 105 Q 110 100 108 75 Q 108 55 110 48 Z" 
+              fill="#000000" opacity="0.15" filter="url(#shadow)"/>
         
-        <!-- Right ribbon (blue to cyan) -->
-        <path d="M 80 25 Q 85 30 85 50 Q 85 70 75 80 Q 72 82 70 80 Q 75 72 75 50 Q 75 35 68 28 Z" 
-              fill="url(#hGradient)" filter="url(#hGlow)" opacity="0.9"/>
+        <path d="M 42 45 Q 40 52 40 70 Q 40 88 45 105 C 48 108 52 105 52 100 Q 48 85 48 70 Q 48 55 50 48 Q 48 44 42 45 Z" 
+              fill="url(#leftRibbon)" filter="url(#ribbonGlow)" opacity="0.95"/>
+        <path d="M 43 48 Q 42 54 42 68 Q 42 82 46 98 C 47 100 49 99 49 96 Q 46 84 46 70 Q 46 57 48 50 Q 46 47 43 48 Z" 
+              fill="#fca5de" opacity="0.4"/>
         
-        <!-- Center crossbar with 3D depth -->
-        <path d="M 25 48 Q 30 45 50 45 Q 70 45 75 48 L 75 58 Q 70 61 50 61 Q 30 61 25 58 Z" 
-              fill="url(#hGradient)" filter="url(#hGlow)" opacity="0.85"/>
+        <path d="M 118 45 Q 120 52 120 70 Q 120 88 115 105 C 112 108 108 105 108 100 Q 112 85 112 70 Q 112 55 110 48 Q 112 44 118 45 Z" 
+              fill="url(#rightRibbon)" filter="url(#ribbonGlow)" opacity="0.95"/>
+        <path d="M 117 48 Q 118 54 118 68 Q 118 82 114 98 C 113 100 111 99 111 96 Q 114 84 114 70 Q 114 57 112 50 Q 114 47 117 48 Z" 
+              fill="#a5f3fc" opacity="0.4"/>
         
-        <!-- Top swoosh accent -->
-        <path d="M 45 20 Q 60 15 75 25 Q 80 30 75 35 Q 60 28 50 30" 
-              fill="url(#hGradient)" filter="url(#hGlow)" opacity="0.75"/>
+        <defs>
+          <linearGradient id="centerBar" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#f472b6"/>
+            <stop offset="40%" style="stop-color:#ec4899"/>
+            <stop offset="60%" style="stop-color:#06b6d4"/>
+            <stop offset="100%" style="stop-color:#22d3ee"/>
+          </linearGradient>
+        </defs>
+        <path d="M 45 68 Q 52 65 80 65 Q 108 65 115 68 L 115 82 Q 108 85 80 85 Q 52 85 45 82 Z" 
+              fill="url(#centerBar)" filter="url(#ribbonGlow)"/>
+        <path d="M 45 70 Q 52 68 80 68 Q 108 68 115 70 L 115 74 Q 108 76 80 76 Q 52 76 45 74 Z" 
+              fill="#ffffff" opacity="0.3"/>
+        
+        <path d="M 60 40 Q 80 32 105 45 Q 98 38 80 35 Q 70 33 60 40" 
+              fill="#ec4899" opacity="0.5" filter="url(#ribbonGlow)"/>
       </svg>
       
       <div class="logo-text-section">
@@ -379,35 +399,62 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 
 <!-- SPLASH PAGE -->
 <div id="splash-page" class="page hidden">
-  <canvas id="aurora-canvas-splash" aria-hidden="true"></canvas>
+  <canvas id="aurora-canvas-splash" aria-hidden="true" style="display:none"></canvas>
   <div class="splash-content">
-    <svg class="splash-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <svg class="splash-logo-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="hGradientSplash" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1"/>
-          <stop offset="20%" style="stop-color:#d946ef;stop-opacity:1"/>
-          <stop offset="40%" style="stop-color:#a855f7;stop-opacity:1"/>
-          <stop offset="60%" style="stop-color:#3b82f6;stop-opacity:1"/>
-          <stop offset="80%" style="stop-color:#22d3ee;stop-opacity:1"/>
+        <linearGradient id="leftRibbonSplash" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#f472b6;stop-opacity:1"/>
+          <stop offset="50%" style="stop-color:#ec4899;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#be185d;stop-opacity:1"/>
+        </linearGradient>
+        <linearGradient id="rightRibbonSplash" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#67e8f9;stop-opacity:1"/>
+          <stop offset="50%" style="stop-color:#22d3ee;stop-opacity:1"/>
           <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1"/>
         </linearGradient>
-        <filter id="hGlowSplash" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+        <filter id="ribbonGlowSplash">
+          <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
+        <filter id="shadowSplash">
+          <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.35"/>
+        </filter>
       </defs>
       
-      <path d="M 20 25 Q 15 30 15 50 Q 15 70 25 80 Q 28 82 30 80 Q 25 72 25 50 Q 25 35 32 28 Z" 
-            fill="url(#hGradientSplash)" filter="url(#hGlowSplash)" opacity="0.95"/>
-      <path d="M 80 25 Q 85 30 85 50 Q 85 70 75 80 Q 72 82 70 80 Q 75 72 75 50 Q 75 35 68 28 Z" 
-            fill="url(#hGradientSplash)" filter="url(#hGlowSplash)" opacity="0.9"/>
-      <path d="M 25 48 Q 30 45 50 45 Q 70 45 75 48 L 75 58 Q 70 61 50 61 Q 30 61 25 58 Z" 
-            fill="url(#hGradientSplash)" filter="url(#hGlowSplash)" opacity="0.85"/>
-      <path d="M 45 20 Q 60 15 75 25 Q 80 30 75 35 Q 60 28 50 30" 
-            fill="url(#hGradientSplash)" filter="url(#hGlowSplash)" opacity="0.75"/>
+      <path d="M 45 45 Q 48 50 48 70 Q 48 90 42 105 Q 50 100 52 75 Q 52 55 50 48 Z" 
+            fill="#000000" opacity="0.2" filter="url(#shadowSplash)"/>
+      <path d="M 115 45 Q 112 50 112 70 Q 112 90 118 105 Q 110 100 108 75 Q 108 55 110 48 Z" 
+            fill="#000000" opacity="0.2" filter="url(#shadowSplash)"/>
+      
+      <path d="M 42 45 Q 40 52 40 70 Q 40 88 45 105 C 48 108 52 105 52 100 Q 48 85 48 70 Q 48 55 50 48 Q 48 44 42 45 Z" 
+            fill="url(#leftRibbonSplash)" filter="url(#ribbonGlowSplash)" opacity="0.95"/>
+      <path d="M 43 48 Q 42 54 42 68 Q 42 82 46 98 C 47 100 49 99 49 96 Q 46 84 46 70 Q 46 57 48 50 Q 46 47 43 48 Z" 
+            fill="#fca5de" opacity="0.45"/>
+      
+      <path d="M 118 45 Q 120 52 120 70 Q 120 88 115 105 C 112 108 108 105 108 100 Q 112 85 112 70 Q 112 55 110 48 Q 112 44 118 45 Z" 
+            fill="url(#rightRibbonSplash)" filter="url(#ribbonGlowSplash)" opacity="0.95"/>
+      <path d="M 117 48 Q 118 54 118 68 Q 118 82 114 98 C 113 100 111 99 111 96 Q 114 84 114 70 Q 114 57 112 50 Q 114 47 117 48 Z" 
+            fill="#a5f3fc" opacity="0.45"/>
+      
+      <defs>
+        <linearGradient id="centerBarSplash" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#f472b6"/>
+          <stop offset="40%" style="stop-color:#ec4899"/>
+          <stop offset="60%" style="stop-color:#06b6d4"/>
+          <stop offset="100%" style="stop-color:#22d3ee"/>
+        </linearGradient>
+      </defs>
+      <path d="M 45 68 Q 52 65 80 65 Q 108 65 115 68 L 115 82 Q 108 85 80 85 Q 52 85 45 82 Z" 
+            fill="url(#centerBarSplash)" filter="url(#ribbonGlowSplash)"/>
+      <path d="M 45 70 Q 52 68 80 68 Q 108 68 115 70 L 115 74 Q 108 76 80 76 Q 52 76 45 74 Z" 
+            fill="#ffffff" opacity="0.35"/>
+      
+      <path d="M 60 40 Q 80 32 105 45 Q 98 38 80 35 Q 70 33 60 40" 
+            fill="#ec4899" opacity="0.55" filter="url(#ribbonGlowSplash)"/>
     </svg>
     <h1 class="splash-title aurora-text">HybridAI</h1>
     <p class="splash-subtitle-1 aurora-text">Medical Chronology &amp; Analyzer Intelligence</p>
@@ -424,33 +471,60 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 <div id="dashboard-page" class="page hidden">
   <div class="dash-header">
     <div class="header-left">
-      <svg class="logo-h-nav-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <svg class="logo-h-nav-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="hGradientNav" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1"/>
-            <stop offset="20%" style="stop-color:#d946ef;stop-opacity:1"/>
-            <stop offset="40%" style="stop-color:#a855f7;stop-opacity:1"/>
-            <stop offset="60%" style="stop-color:#3b82f6;stop-opacity:1"/>
-            <stop offset="80%" style="stop-color:#22d3ee;stop-opacity:1"/>
+          <linearGradient id="leftRibbonNav" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#f472b6;stop-opacity:1"/>
+            <stop offset="50%" style="stop-color:#ec4899;stop-opacity:1"/>
+            <stop offset="100%" style="stop-color:#be185d;stop-opacity:1"/>
+          </linearGradient>
+          <linearGradient id="rightRibbonNav" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#67e8f9;stop-opacity:1"/>
+            <stop offset="50%" style="stop-color:#22d3ee;stop-opacity:1"/>
             <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1"/>
           </linearGradient>
-          <filter id="hGlowNav" x="-50%" y="-50%" width="200%" height="200%">
+          <filter id="ribbonGlowNav">
             <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+          <filter id="shadowNav">
+            <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-opacity="0.25"/>
+          </filter>
         </defs>
         
-        <path d="M 20 25 Q 15 30 15 50 Q 15 70 25 80 Q 28 82 30 80 Q 25 72 25 50 Q 25 35 32 28 Z" 
-              fill="url(#hGradientNav)" filter="url(#hGlowNav)" opacity="0.95"/>
-        <path d="M 80 25 Q 85 30 85 50 Q 85 70 75 80 Q 72 82 70 80 Q 75 72 75 50 Q 75 35 68 28 Z" 
-              fill="url(#hGradientNav)" filter="url(#hGlowNav)" opacity="0.9"/>
-        <path d="M 25 48 Q 30 45 50 45 Q 70 45 75 48 L 75 58 Q 70 61 50 61 Q 30 61 25 58 Z" 
-              fill="url(#hGradientNav)" filter="url(#hGlowNav)" opacity="0.85"/>
-        <path d="M 45 20 Q 60 15 75 25 Q 80 30 75 35 Q 60 28 50 30" 
-              fill="url(#hGradientNav)" filter="url(#hGlowNav)" opacity="0.75"/>
+        <path d="M 45 45 Q 48 50 48 70 Q 48 90 42 105 Q 50 100 52 75 Q 52 55 50 48 Z" 
+              fill="#000000" opacity="0.12" filter="url(#shadowNav)"/>
+        <path d="M 115 45 Q 112 50 112 70 Q 112 90 118 105 Q 110 100 108 75 Q 108 55 110 48 Z" 
+              fill="#000000" opacity="0.12" filter="url(#shadowNav)"/>
+        
+        <path d="M 42 45 Q 40 52 40 70 Q 40 88 45 105 C 48 108 52 105 52 100 Q 48 85 48 70 Q 48 55 50 48 Q 48 44 42 45 Z" 
+              fill="url(#leftRibbonNav)" filter="url(#ribbonGlowNav)" opacity="0.95"/>
+        <path d="M 43 48 Q 42 54 42 68 Q 42 82 46 98 C 47 100 49 99 49 96 Q 46 84 46 70 Q 46 57 48 50 Q 46 47 43 48 Z" 
+              fill="#fca5de" opacity="0.35"/>
+        
+        <path d="M 118 45 Q 120 52 120 70 Q 120 88 115 105 C 112 108 108 105 108 100 Q 112 85 112 70 Q 112 55 110 48 Q 112 44 118 45 Z" 
+              fill="url(#rightRibbonNav)" filter="url(#ribbonGlowNav)" opacity="0.95"/>
+        <path d="M 117 48 Q 118 54 118 68 Q 118 82 114 98 C 113 100 111 99 111 96 Q 114 84 114 70 Q 114 57 112 50 Q 114 47 117 48 Z" 
+              fill="#a5f3fc" opacity="0.35"/>
+        
+        <defs>
+          <linearGradient id="centerBarNav" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#f472b6"/>
+            <stop offset="40%" style="stop-color:#ec4899"/>
+            <stop offset="60%" style="stop-color:#06b6d4"/>
+            <stop offset="100%" style="stop-color:#22d3ee"/>
+          </linearGradient>
+        </defs>
+        <path d="M 45 68 Q 52 65 80 65 Q 108 65 115 68 L 115 82 Q 108 85 80 85 Q 52 85 45 82 Z" 
+              fill="url(#centerBarNav)" filter="url(#ribbonGlowNav)"/>
+        <path d="M 45 70 Q 52 68 80 68 Q 108 68 115 70 L 115 74 Q 108 76 80 76 Q 52 76 45 74 Z" 
+              fill="#ffffff" opacity="0.3"/>
+        
+        <path d="M 60 40 Q 80 32 105 45 Q 98 38 80 35 Q 70 33 60 40" 
+              fill="#ec4899" opacity="0.45" filter="url(#ribbonGlowNav)"/>
       </svg>
       <span class="nav-brand-text">HybridAI</span>
       <span class="nav-subtitle">Legal Medical Intelligence</span>
@@ -671,6 +745,7 @@ function toast(msg) {
 
 function startSplashAnimation() {
   const canvas = document.getElementById("aurora-canvas-splash");
+  if (!canvas) return;
   const ctx = canvas.getContext("2d");
   
   function resizeCanvas() {
