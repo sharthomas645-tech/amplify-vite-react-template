@@ -225,6 +225,7 @@
             <button id="buildChronBtn" type="button">Build Chronology</button>
             <button id="rnReviewBtn" type="button">RN Review Request</button>
             <button id="exportBtn" type="button">Export Files</button>
+            <button id="getLastAgentBtn" type="button">Get Last Agent</button>
         </div>
         
         <div class="cards">
@@ -254,7 +255,8 @@ const API_ENDPOINTS = {
     UPLOAD: 'https://vicwyv5xoi.execute-api.us-west-2.amazonaws.com/prod/upload',
     BUILD_CHRONOLOGY: 'https://huy6splpn3.execute-api.us-west-2.amazonaws.com/prod/build',
     RN_REVIEW: 'https://rolkt59qj4.execute-api.us-west-2.amazonaws.com/prod/rn/request',
-    EXPORT: 'https://g4r3dpjiu9.execute-api.us-west-2.amazonaws.com/prod/export'
+    EXPORT: 'https://g4r3dpjiu9.execute-api.us-west-2.amazonaws.com/prod/export',
+    GET_LAST_AGENT: 'https://huy6splpn3.execute-api.us-west-2.amazonaws.com/prod/agent/last'
 };
 
 // ============================================================================
@@ -806,6 +808,60 @@ function setupButtons() {
             console.error('Export error:', err);
         } finally {
             setButtonLoading('exportBtn', false);
+        }
+    });
+
+    document.getElementById('getLastAgentBtn').addEventListener('click', async () => {
+        try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                showError('Please log in first');
+                return;
+            }
+
+            const caseId = document.getElementById('casesDropdown').value;
+            if (!caseId) {
+                showError('Please select a case first');
+                return;
+            }
+
+            setButtonLoading('getLastAgentBtn', true);
+            console.log('Getting last agent for case:', caseId);
+
+            const response = await fetch(`${API_ENDPOINTS.GET_LAST_AGENT}?caseId=${encodeURIComponent(caseId)}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status === 401) {
+                localStorage.clear();
+                showError('Session expired. Please log in again.');
+                showLoginScreen();
+                setupLoginButton();
+                setButtonLoading('getLastAgentBtn', false);
+                return;
+            }
+
+            if (!response.ok) {
+                const errResult = await response.json().catch(() => ({}));
+                showError('Error retrieving last agent: ' + (errResult.error || `Status ${response.status}`));
+                setButtonLoading('getLastAgentBtn', false);
+                return;
+            }
+
+            const result = await response.json();
+            const agentInfo = result.agent || result;
+            const agentLabel = agentInfo.agentId || agentInfo.name || agentInfo.id || 'Agent retrieved';
+            showSuccess(`Last agent: ${agentLabel}`);
+            console.log('Last agent:', result);
+        } catch (err) {
+            showError('Get last agent error: ' + err.message);
+            console.error('Get last agent error:', err);
+        } finally {
+            setButtonLoading('getLastAgentBtn', false);
         }
     });
 }
