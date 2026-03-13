@@ -6,6 +6,7 @@
 <meta name="description" content="HybridAI Medical Chronology &amp; Analyzer Intelligence — HIPAA-compliant legal medical record review platform for attorneys."/>
 <meta name="robots" content="noindex, nofollow"/>
 <title>HybridAI – Medical Chronology &amp; Analyzer</title>
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@5.2.10/dist/amazon-cognito-identity.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
@@ -48,9 +49,9 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
   50%{filter:drop-shadow(0 0 50px rgba(34,211,238,1)) drop-shadow(0 0 80px rgba(168,85,247,.8))}
 }
 
-.logo-text-section{display:flex;flex-direction:column;gap:.3rem;align-items:flex-start}
+.logo-text-section{display:flex;flex-direction:column;gap:.3rem;align-items:flex-start;margin-top:.5rem}
 
-.logo-text-hybrid{font-size:2.8rem;font-weight:900;line-height:1;letter-spacing:-1px;
+.logo-text-hybrid{font-size:2.8rem;font-weight:900;line-height:1;letter-spacing:-1px;margin-bottom:.5rem;
   background:linear-gradient(90deg,#ffffff 0%,#ffffff 60%,#22d3ee 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   filter:drop-shadow(0 0 15px rgba(34,211,238,.7))}
@@ -94,8 +95,15 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
   letter-spacing:.05em}
 .login-btn:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 10px 40px rgba(168,85,247,.7)}
 .login-btn:active{transform:translateY(0)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
 .login-footer{margin:1.5rem 0 0;text-align:center;font-size:.8rem;color:rgba(80,100,150,.6)}
 .login-hint{font-size:.75rem;color:rgba(80,100,150,.5);text-align:center;margin:.3rem 0 0}
+.cognito-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;
+  margin-top:1rem;padding:.9rem;font-size:1rem;font-weight:700;border:2px solid #2563eb;
+  border-radius:10px;cursor:pointer;width:100%;background:#ffffff;color:#2563eb;
+  transition:all .3s;font-family:inherit;text-transform:uppercase;letter-spacing:.05em}
+.cognito-btn:hover{background:#2563eb;color:#ffffff;box-shadow:0 6px 20px rgba(37,99,235,.4)}
+.cognito-btn:disabled{opacity:.6;cursor:not-allowed}
 
 /* ══════════════════════════════════════════════════════
    SPLASH PAGE
@@ -104,9 +112,14 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
   padding:2rem 1rem;gap:1.5rem;position:relative;z-index:10;min-height:100vh;background:var(--night-bg)}
 
 .splash-content{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
-  position:relative;z-index:11;animation:splashFadeIn 1s ease both}
+  position:relative;z-index:11;animation:splashDisplay 7s ease-in-out forwards}
 
-@keyframes splashFadeIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+@keyframes splashDisplay{
+  0%{opacity:0;transform:scale(0.95)}
+  10%{opacity:1;transform:scale(1)}
+  71%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1)}
+}
 
 .aurora-text{background:linear-gradient(90deg,#60a5fa 0%,#a855f7 25%,#22d3ee 50%,#a855f7 75%,#60a5fa 100%);
   background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
@@ -114,40 +127,16 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 
 @keyframes auroraFlow{0%{background-position:0% center}100%{background-position:300% center}}
 
-.splash-logo-svg{width:250px;height:250px;
-  filter:drop-shadow(0 0 60px rgba(80,160,255,1)) drop-shadow(0 0 100px rgba(168,85,247,.7));
-  animation:splashLogoPulse 2.5s ease-in-out infinite;margin-bottom:1.5rem}
+.splash-logo-svg{width:320px;height:160px;margin-bottom:1rem;
+  filter:drop-shadow(0 0 60px rgba(80,160,255,1)) drop-shadow(0 0 100px rgba(168,85,247,.7))}
 
-@keyframes splashLogoPulse{
-  0%,100%{filter:drop-shadow(0 0 60px rgba(80,160,255,1)) drop-shadow(0 0 100px rgba(168,85,247,.7));transform:scale(1)}
-  50%{filter:drop-shadow(0 0 80px rgba(96,165,250,1)) drop-shadow(0 0 130px rgba(168,85,247,.9));transform:scale(1.1)}
-}
-
-.splash-title{margin:0;font-size:clamp(3.5rem,12vw,5rem);font-weight:900;text-align:center;
-  letter-spacing:-2px;line-height:1;margin-bottom:.8rem;
+.splash-title{margin:0;font-size:clamp(1.5rem,4vw,2rem);font-weight:700;text-align:center;
+  letter-spacing:.03em;line-height:1.4;margin-bottom:.8rem;
   text-shadow:0 0 40px rgba(96,165,250,.6),0 0 60px rgba(168,85,247,.4)}
-
-.splash-subtitle-1{margin:0;font-size:clamp(1.2rem,3.5vw,1.6rem);font-weight:700;text-align:center;
-  letter-spacing:.03em;max-width:700px;line-height:1.4;
-  text-shadow:0 0 25px rgba(96,165,250,.5),0 0 40px rgba(168,85,247,.35)}
 
 .splash-subtitle-2{margin:0;font-size:clamp(1rem,3vw,1.3rem);font-weight:800;text-align:center;
   letter-spacing:.1em;text-transform:uppercase;margin-top:.8rem;
   text-shadow:0 0 30px rgba(96,165,250,.6),0 0 50px rgba(168,85,247,.4);font-style:italic}
-
-.splash-loader{display:flex;gap:.7rem;align-items:center;margin-top:2.5rem}
-
-.loader-dot{width:14px;height:14px;border-radius:50%;
-  background:linear-gradient(135deg,#60a5fa,#a855f7,#22d3ee);
-  animation:splashLoaderBounce 1.4s infinite;box-shadow:0 0 15px rgba(96,165,250,.8)}
-
-.loader-dot:nth-child(2){animation-delay:0.2s}
-.loader-dot:nth-child(3){animation-delay:0.4s}
-
-@keyframes splashLoaderBounce{
-  0%,80%,100%{transform:scale(1);opacity:.7}
-  40%{transform:scale(1.4);opacity:1}
-}
 
 /* ══════════════════════════════════════════════════════
    DASHBOARD
@@ -183,16 +172,18 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 .logout-btn:hover{background:rgba(59,130,246,.15);border-color:#60a5fa;color:#ffffff}
 
 .dash-body{flex:1;display:flex;flex-direction:column;padding:3rem 2.5rem;gap:2.5rem;
-  background:radial-gradient(ellipse at 50% 20%, rgba(59,130,246,.1) 0%, transparent 50%),
-             radial-gradient(ellipse at 50% 80%, rgba(168,85,247,.08) 0%, transparent 50%);
-  overflow-y:auto}
+  overflow-y:auto;position:relative}
 
-.dashboard-welcome{text-align:center;margin-bottom:1rem}
+.dash-body::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 20%, rgba(59,130,246,.1) 0%, transparent 50%),
+             radial-gradient(ellipse at 50% 80%, rgba(168,85,247,.08) 0%, transparent 50%)}
+
+.dashboard-welcome{text-align:center;margin-bottom:1rem;position:relative;z-index:1}
 .welcome-title{margin:0;font-size:1.8rem;font-weight:800;
   color:rgba(30,60,140,.95);margin-bottom:.5rem}
 .welcome-subtitle{margin:0;font-size:.95rem;color:rgba(80,100,150,.75)}
 
-.dashboard-controls{display:flex;flex-wrap:wrap;gap:1.8rem;align-items:flex-end;margin-bottom:2rem}
+.dashboard-controls{display:flex;flex-wrap:wrap;gap:1.8rem;align-items:flex-end;margin-bottom:2rem;position:relative;z-index:1}
 
 .case-selector-group{flex:1;min-width:280px}
 .case-label{font-size:.78rem;font-weight:700;color:rgba(80,100,150,.85);
@@ -232,7 +223,7 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 .action-export:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(59,130,246,.7)}
 
 .dashboard-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;
-  margin-bottom:2rem}
+  margin-bottom:2rem;position:relative;z-index:1}
 
 .info-card{background:linear-gradient(135deg,rgba(200,215,255,0.95),rgba(220,200,255,0.88));
   border:2px solid rgba(150,180,255,.45);border-radius:18px;padding:2.2rem;backdrop-filter:blur(20px);
@@ -255,7 +246,7 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 .case-detail-section{background:linear-gradient(135deg,rgba(200,215,255,0.95),rgba(220,200,255,0.88));
   border:2px solid rgba(150,180,255,.45);border-radius:18px;padding:2.8rem;backdrop-filter:blur(20px);
   box-shadow:0 16px 48px rgba(30,80,200,.2),inset 0 0 40px rgba(150,180,255,.2);
-  grid-column:1/-1}
+  grid-column:1/-1;position:relative;z-index:1}
 
 .section-title{margin:0 0 2rem;font-size:1.3rem;font-weight:800;
   color:rgba(30,60,140,.95);display:flex;align-items:center;gap:1rem}
@@ -380,90 +371,59 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 
   <div class="login-card">
     <h2 class="login-title">Attorney Access Portal</h2>
-    <form class="login-form" id="login-form" onsubmit="return false">
-      <div class="form-group">
-        <label class="form-label" for="email-input">Email Address</label>
-        <input id="email-input" class="form-input" type="email" placeholder="attorney@firm.com" autocomplete="username"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="pw-input">Password</label>
-        <input id="pw-input" class="form-input" type="password" placeholder="••••••••" autocomplete="current-password"/>
-      </div>
-      <p id="login-error" class="error-msg hidden" role="alert" aria-live="polite"></p>
-      <button type="submit" class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
-    </form>
-    <p class="login-hint">Demo: any email + password</p>
-    <p class="login-footer">HybridAI © 2025 &nbsp;|&nbsp; HIPAA-Compliant</p>
+    <button class="cognito-btn" id="cognito-login-btn" onclick="initiateLogin()">🔐 Sign In With Cognito</button>
+    <p id="login-error" class="error-msg hidden" role="alert" aria-live="polite"></p>
+    <p class="login-footer">HybridAI © 2025 &nbsp;|&nbsp; HIPAA-Compliant Platform</p>
   </div>
 </div>
 
 <!-- SPLASH PAGE -->
 <div id="splash-page" class="page hidden">
-  <canvas id="aurora-canvas-splash" aria-hidden="true" style="display:none"></canvas>
+  <canvas id="aurora-canvas-splash" aria-hidden="true"></canvas>
   <div class="splash-content">
-    <svg class="splash-logo-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+    <svg class="splash-logo-svg" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="leftRibbonSplash" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#f472b6;stop-opacity:1"/>
-          <stop offset="50%" style="stop-color:#ec4899;stop-opacity:1"/>
-          <stop offset="100%" style="stop-color:#be185d;stop-opacity:1"/>
+        <linearGradient id="bgGradSplash" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1"/>
+          <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1"/>
         </linearGradient>
-        <linearGradient id="rightRibbonSplash" x1="100%" y1="0%" x2="0%" y2="100%">
+        <linearGradient id="leftRibSplash" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#f472b6;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1"/>
+        </linearGradient>
+        <linearGradient id="rightRibSplash" x1="100%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" style="stop-color:#67e8f9;stop-opacity:1"/>
-          <stop offset="50%" style="stop-color:#22d3ee;stop-opacity:1"/>
           <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1"/>
         </linearGradient>
-        <filter id="ribbonGlowSplash">
-          <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-        <filter id="shadowSplash">
-          <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.35"/>
+        <filter id="logoGlowBigSplash">
+          <feGaussianBlur stdDeviation="3"/>
         </filter>
       </defs>
       
-      <path d="M 45 45 Q 48 50 48 70 Q 48 90 42 105 Q 50 100 52 75 Q 52 55 50 48 Z" 
-            fill="#000000" opacity="0.2" filter="url(#shadowSplash)"/>
-      <path d="M 115 45 Q 112 50 112 70 Q 112 90 118 105 Q 110 100 108 75 Q 108 55 110 48 Z" 
-            fill="#000000" opacity="0.2" filter="url(#shadowSplash)"/>
+      <rect width="400" height="200" fill="url(#bgGradSplash)"/>
       
-      <path d="M 42 45 Q 40 52 40 70 Q 40 88 45 105 C 48 108 52 105 52 100 Q 48 85 48 70 Q 48 55 50 48 Q 48 44 42 45 Z" 
-            fill="url(#leftRibbonSplash)" filter="url(#ribbonGlowSplash)" opacity="0.95"/>
-      <path d="M 43 48 Q 42 54 42 68 Q 42 82 46 98 C 47 100 49 99 49 96 Q 46 84 46 70 Q 46 57 48 50 Q 46 47 43 48 Z" 
-            fill="#fca5de" opacity="0.45"/>
+      <path d="M 60 50 Q 55 60 55 100 Q 55 140 70 160 Q 75 158 78 145 Q 72 120 72 100 Q 72 70 75 55 Z" 
+            fill="url(#leftRibSplash)" filter="url(#logoGlowBigSplash)" opacity="0.9"/>
+      <path d="M 65 55 Q 62 65 62 100 Q 62 135 72 152 Q 75 150 77 138 Q 70 115 70 100 Q 70 75 73 60 Z" 
+            fill="#fca5de" opacity="0.3"/>
       
-      <path d="M 118 45 Q 120 52 120 70 Q 120 88 115 105 C 112 108 108 105 108 100 Q 112 85 112 70 Q 112 55 110 48 Q 112 44 118 45 Z" 
-            fill="url(#rightRibbonSplash)" filter="url(#ribbonGlowSplash)" opacity="0.95"/>
-      <path d="M 117 48 Q 118 54 118 68 Q 118 82 114 98 C 113 100 111 99 111 96 Q 114 84 114 70 Q 114 57 112 50 Q 114 47 117 48 Z" 
-            fill="#a5f3fc" opacity="0.45"/>
+      <path d="M 70 95 Q 80 90 120 90 Q 160 90 170 95 L 170 115 Q 160 120 120 120 Q 80 120 70 115 Z" 
+            fill="url(#rightRibSplash)" filter="url(#logoGlowBigSplash)" opacity="0.85"/>
+      <path d="M 75 98 Q 85 95 120 95 Q 155 95 165 98 L 165 110 Q 155 113 120 113 Q 85 113 75 110 Z" 
+            fill="#ffffff" opacity="0.25"/>
       
-      <defs>
-        <linearGradient id="centerBarSplash" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" style="stop-color:#f472b6"/>
-          <stop offset="40%" style="stop-color:#ec4899"/>
-          <stop offset="60%" style="stop-color:#06b6d4"/>
-          <stop offset="100%" style="stop-color:#22d3ee"/>
-        </linearGradient>
-      </defs>
-      <path d="M 45 68 Q 52 65 80 65 Q 108 65 115 68 L 115 82 Q 108 85 80 85 Q 52 85 45 82 Z" 
-            fill="url(#centerBarSplash)" filter="url(#ribbonGlowSplash)"/>
-      <path d="M 45 70 Q 52 68 80 68 Q 108 68 115 70 L 115 74 Q 108 76 80 76 Q 52 76 45 74 Z" 
-            fill="#ffffff" opacity="0.35"/>
+      <path d="M 340 50 Q 345 60 345 100 Q 345 140 330 160 Q 325 158 322 145 Q 328 120 328 100 Q 328 70 325 55 Z" 
+            fill="url(#rightRibSplash)" filter="url(#logoGlowBigSplash)" opacity="0.9"/>
+      <path d="M 335 55 Q 338 65 338 100 Q 338 135 328 152 Q 325 150 323 138 Q 330 115 330 100 Q 330 75 327 60 Z" 
+            fill="#a5f3fc" opacity="0.3"/>
       
-      <path d="M 60 40 Q 80 32 105 45 Q 98 38 80 35 Q 70 33 60 40" 
-            fill="#ec4899" opacity="0.55" filter="url(#ribbonGlowSplash)"/>
+      <text x="200" y="130" font-size="72" font-weight="900" font-family="Inter, Arial, sans-serif" text-anchor="middle" fill="#ffffff" letter-spacing="-2">HybridAI</text>
+      <text x="200" y="130" font-size="72" font-weight="900" font-family="Inter, Arial, sans-serif" text-anchor="middle" fill="none" stroke="#22d3ee" stroke-width="1" opacity="0.5" letter-spacing="-2" filter="url(#logoGlowBigSplash)">HybridAI</text>
     </svg>
-    <h1 class="splash-title aurora-text">HybridAI</h1>
-    <p class="splash-subtitle-1 aurora-text">Medical Chronology &amp; Analyzer Intelligence</p>
-    <p class="splash-subtitle-2 aurora-text">Processing Your Case Data</p>
-    <div class="splash-loader">
-      <div class="loader-dot"></div>
-      <div class="loader-dot"></div>
-      <div class="loader-dot"></div>
-    </div>
+
+    <h1 class="splash-title aurora-text" style="margin-bottom:1rem">Medical Chronology &amp; Analyzer Intelligence</h1>
+    <p class="splash-subtitle-2 aurora-text">We Make It Make Sense</p>
   </div>
 </div>
 
@@ -627,6 +587,29 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--night-b
 <div id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
+// ════════════════════════════════════════════════════════
+// AWS COGNITO CONFIGURATION
+// ════════════════════════════════════════════════════════
+// REPLACE THESE WITH YOUR ACTUAL COGNITO VALUES
+const COGNITO_CONFIG = {
+  UserPoolId: 'us-east-1_XXXXXXXXX', // Your Cognito User Pool ID
+  ClientId: 'XXXXXXXXXXXXXXXXXXXXXXXXXX', // Your Cognito Client ID
+  RedirectUri: 'https://www.hybridaimedlegal.com/', // Your redirect URL
+  Region: 'us-east-1'
+};
+
+const cognitoIdentityServiceProvider = new AmazonCognitoIdentity.CognitoIdentityServiceProvider({
+  region: COGNITO_CONFIG.Region
+});
+
+const userPool = new AmazonCognitoIdentity.CognitoUserPool({
+  UserPoolId: COGNITO_CONFIG.UserPoolId,
+  ClientId: COGNITO_CONFIG.ClientId
+});
+
+// ════════════════════════════════════════════════════════
+// DEMO DATA
+// ════════════════════════════════════════════════════════
 const DEMO_CASES = [
   { id:"C-2024-001", patient:"John A. Smith", type:"Personal Injury", opened:"2024-01-15", status:"Ready for Export", events:12 },
   { id:"C-2024-002", patient:"Maria L. Garcia", type:"Medical Malpractice", opened:"2024-02-03", status:"RN Review in Progress", events:8 },
@@ -647,15 +630,84 @@ let timeline = DEMO_TIMELINE.map(e => Object.assign({}, e));
 let selectedCaseId = cases[0].id;
 let currentUser = "";
 
-function doLogin() {
-  const email = document.getElementById("email-input").value.trim();
-  const pw = document.getElementById("pw-input").value;
-  const err = document.getElementById("login-error");
+// ════════════════════════════════════════════════════════
+// COGNITO LOGIN FLOW
+// ════════════════════════════════════════════════════════
+function initiateLogin() {
+  const loginBtn = document.getElementById("cognito-login-btn");
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Redirecting to Cognito...";
   
-  if (!email) { err.textContent = "Please enter your email."; err.classList.remove("hidden"); return; }
-  if (!pw) { err.textContent = "Please enter your password."; err.classList.remove("hidden"); return; }
-  err.classList.add("hidden");
+  // Redirect to Cognito hosted UI
+  const cognitoLoginUrl = `https://${COGNITO_CONFIG.UserPoolId.split('_')[1]}.auth.${COGNITO_CONFIG.Region}.amazoncognito.com/oauth2/authorize?client_id=${COGNITO_CONFIG.ClientId}&response_type=code&redirect_uri=${encodeURIComponent(COGNITO_CONFIG.RedirectUri)}&identity_provider=Cognito`;
+  
+  window.location.href = cognitoLoginUrl;
+}
 
+// ════════════════════════════════════════════════════════
+// HANDLE COGNITO REDIRECT (Exchange auth code for token)
+// ════════════════════════════════════════════════════════
+function handleCognitoCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const authCode = urlParams.get('code');
+  
+  if (authCode) {
+    exchangeCodeForToken(authCode);
+  } else {
+    const currentUser = userPool.getCurrentUser();
+    if (currentUser) {
+      currentUser.getSession(function(err, session) {
+        if (err) {
+          console.error("Session error:", err);
+          return;
+        }
+        if (session.isValid()) {
+          showSplashAndDashboard(currentUser.getUsername());
+        }
+      });
+    }
+  }
+}
+
+function exchangeCodeForToken(authCode) {
+  const tokenEndpoint = `https://${COGNITO_CONFIG.UserPoolId.split('_')[1]}.auth.${COGNITO_CONFIG.Region}.amazoncognito.com/oauth2/token`;
+  
+  fetch(tokenEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: COGNITO_CONFIG.ClientId,
+      code: authCode,
+      redirect_uri: COGNITO_CONFIG.RedirectUri,
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.access_token) {
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('id_token', data.id_token);
+      
+      // Get user info and show dashboard
+      fetch(`https://${COGNITO_CONFIG.UserPoolId.split('_')[1]}.auth.${COGNITO_CONFIG.Region}.amazoncognito.com/oauth2/userInfo`, {
+        headers: { 'Authorization': `Bearer ${data.access_token}` }
+      })
+      .then(res => res.json())
+      .then(userInfo => {
+        showSplashAndDashboard(userInfo.email);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      });
+    }
+  })
+  .catch(err => {
+    console.error("Token exchange error:", err);
+    showError("Authentication failed. Please try again.");
+  });
+}
+
+function showSplashAndDashboard(email) {
   document.getElementById("login-page").classList.add("hidden");
   document.getElementById("splash-page").classList.remove("hidden");
   startSplashAnimation();
@@ -668,17 +720,39 @@ function doLogin() {
     document.getElementById("dashboard-page").classList.remove("hidden");
     buildCaseSelector();
     displayCaseDetails();
-  }, 2800);
+  }, 7000);
 }
 
 function doLogout() {
+  // Clear tokens
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('id_token');
+  
+  // Sign out from Cognito
+  const currentUser = userPool.getCurrentUser();
+  if (currentUser) {
+    currentUser.signOut();
+  }
+  
   document.getElementById("login-page").classList.remove("hidden");
   document.getElementById("dashboard-page").classList.add("hidden");
   document.getElementById("splash-page").classList.add("hidden");
-  document.getElementById("email-input").value = "";
-  document.getElementById("pw-input").value = "";
+  
+  // Reset login button
+  const loginBtn = document.getElementById("cognito-login-btn");
+  loginBtn.disabled = false;
+  loginBtn.textContent = "🔐 Sign In With Cognito";
 }
 
+function showError(message) {
+  const err = document.getElementById("login-error");
+  err.textContent = message;
+  err.classList.remove("hidden");
+}
+
+// ════════════════════════════════════════════════════════
+// DASHBOARD FUNCTIONS
+// ════════════════════════════════════════════════════════
 function buildCaseSelector() {
   const sel = document.getElementById("case-select");
   sel.innerHTML = "";
@@ -819,38 +893,40 @@ function startSplashAnimation() {
 
   let time = 0;
   function animate() {
-    time += 0.0006;
-    ctx.fillStyle = "rgba(2,2,12,0.1)";
+    time += 0.0003;
+    ctx.fillStyle = "rgba(2,2,12,0.08)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const centerX = canvas.width * 0.5;
     const centerY = canvas.height * 0.5;
-    const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY) * 1.5;
+    const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY) * 1.8;
 
     const swirls = [
-      { color: "rgba(59,130,246,", alpha: 0.42, radiusScale: 0.3, rotationSpeed: 0.0006, spiralTightness: 0.002 },
-      { color: "rgba(99,160,255,", alpha: 0.38, radiusScale: 0.5, rotationSpeed: 0.0005, spiralTightness: 0.0018 },
-      { color: "rgba(168,85,247,", alpha: 0.45, radiusScale: 0.65, rotationSpeed: 0.00065, spiralTightness: 0.0022 },
-      { color: "rgba(34,211,238,", alpha: 0.40, radiusScale: 0.8, rotationSpeed: 0.0007, spiralTightness: 0.0015 },
-      { color: "rgba(196,100,255,", alpha: 0.43, radiusScale: 0.95, rotationSpeed: 0.0004, spiralTightness: 0.002 },
+      { color: "rgba(59,130,246,", alpha: 0.35, radiusScale: 0.2, rotationSpeed: 0.0002, spiralTightness: 0.001 },
+      { color: "rgba(99,160,255,", alpha: 0.32, radiusScale: 0.4, rotationSpeed: 0.00015, spiralTightness: 0.0012 },
+      { color: "rgba(168,85,247,", alpha: 0.38, radiusScale: 0.6, rotationSpeed: 0.00025, spiralTightness: 0.0014 },
+      { color: "rgba(34,211,238,", alpha: 0.33, radiusScale: 0.75, rotationSpeed: 0.0003, spiralTightness: 0.001 },
+      { color: "rgba(196,100,255,", alpha: 0.36, radiusScale: 0.9, rotationSpeed: 0.0002, spiralTightness: 0.0012 },
     ];
 
     swirls.forEach(function(swirl, idx) {
-      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, maxRadius * 0.8);
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, maxRadius);
       gradient.addColorStop(0, swirl.color + "0)");
-      gradient.addColorStop(0.25, swirl.color + (swirl.alpha * 0.4) + ")");
+      gradient.addColorStop(0.25, swirl.color + (swirl.alpha * 0.3) + ")");
       gradient.addColorStop(0.5, swirl.color + swirl.alpha + ")");
-      gradient.addColorStop(0.75, swirl.color + (swirl.alpha * 0.5) + ")");
+      gradient.addColorStop(0.75, swirl.color + (swirl.alpha * 0.4) + ")");
       gradient.addColorStop(1, swirl.color + "0)");
 
       ctx.fillStyle = gradient;
       ctx.beginPath();
 
-      for (let angle = 0; angle < Math.PI * 8; angle += 0.08) {
+      for (let angle = 0; angle < Math.PI * 8; angle += 0.1) {
         const rotatedAngle = angle + time * swirl.rotationSpeed;
         const spiralRadius = angle * swirl.spiralTightness * maxRadius * swirl.radiusScale;
-        const waveAmount = Math.sin(angle * 0.5 + time * 0.0003) * 30;
+        
+        const waveAmount = Math.sin(angle * 0.3 + time * 0.00005) * 20;
         const radius = Math.min(spiralRadius + waveAmount, maxRadius * swirl.radiusScale);
+        
         const x = centerX + Math.cos(rotatedAngle) * radius;
         const y = centerY + Math.sin(rotatedAngle) * radius;
         
@@ -868,11 +944,8 @@ function startSplashAnimation() {
   animate();
 })();
 
-document.addEventListener("keydown", function(e) {
-  if (e.key === "Enter" && !document.getElementById("login-page").classList.contains("hidden")) {
-    doLogin();
-  }
-});
+// Handle Cognito callback on page load
+window.addEventListener('load', handleCognitoCallback);
 </script>
 
 </body>
