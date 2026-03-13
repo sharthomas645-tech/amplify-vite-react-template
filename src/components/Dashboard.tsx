@@ -117,8 +117,7 @@ const Dashboard: FC<DashboardProps> = ({ user, onLogout }) => {
       {/* Top Nav */}
       <nav className="dashboard-nav">
         <div className="nav-brand">
-          <span className="logo-h-sm">H</span>
-          <span className="nav-brand-text">ybridAI</span>
+          <img src="/hybridai.png" alt="HybridAI" className="nav-logo-img" />
           <span className="nav-separator">|</span>
           <span className="nav-subtitle">Medical Chronology &amp; Analyzer Intelligence</span>
         </div>
