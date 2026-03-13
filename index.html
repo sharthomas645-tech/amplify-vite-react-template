@@ -654,7 +654,9 @@ async function loadTimeline(caseId) {
 
 /* ═══════════════════════════════════════════════════════════
    API — AttorneyUploadAPI
-   POST /upload  (multipart/form-data: file + caseId + attorney)
+   Step 1: POST /upload  { fileName, caseId, attorney, patientName }
+           → receives presigned S3 URL
+   Step 2: PUT file directly to S3 via presigned URL
 ═══════════════════════════════════════════════════════════ */
 function doUpload() {
   document.getElementById("pdf-file-input").click();
@@ -668,15 +670,34 @@ async function handlePDFUpload(input) {
   setBtnLoading(btn, lbl, "Uploading\u2026");
   try {
     const caseObj = CASES.find(c => c.id === selectedId) || CASES[0];
-    const form = new FormData();
-    form.append("file",        file);
-    form.append("caseId",      caseObj.id);
-    form.append("attorney",    currentUser);
-    form.append("patientName", caseObj.patient);
-    const res  = await fetch(apiUrl(API.ids.upload, "/upload"), { method: "POST", body: form });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json().catch(() => ({}));
-    toast("\u2705 " + file.name + " uploaded" + (data.message ? " \u2014 " + data.message : ""));
+
+    // Step 1: POST JSON metadata to Lambda → receive presigned S3 URL
+    const metaRes = await fetch(apiUrl(API.ids.upload, "/upload"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fileName:    file.name,
+        caseId:      caseObj.id,
+        attorney:    currentUser,
+        patientName: caseObj.patient
+      })
+    });
+    if (!metaRes.ok) throw new Error("Upload init failed: HTTP " + metaRes.status);
+    // Lambda returns both uploadUrl and url for compatibility; prefer uploadUrl
+    const { uploadUrl, url } = await metaRes.json();
+    const presignedUrl = uploadUrl || url;
+    if (!presignedUrl) throw new Error("No presigned URL returned from server");
+
+    // Step 2: PUT the PDF file directly to S3 using the presigned URL
+    const s3Res = await fetch(presignedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "application/pdf" },
+      body: file
+    });
+    if (!s3Res.ok) throw new Error("S3 upload failed: HTTP " + s3Res.status);
+
+    // Step 3: Confirm success and refresh UI
+    toast("\u2705 " + file.name + " uploaded successfully");
     await loadCases();
     rebuildDashboard();
   } catch (e) {
