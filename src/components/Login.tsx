@@ -34,10 +34,7 @@ const Login: FC<LoginProps> = ({ onLogin }) => {
     <div className="login-container">
       {/* Branding */}
       <div className="brand-section">
-        <div className="hybrid-logo">
-          <span className="logo-h">H</span>
-          <span className="logo-text">ybridAI</span>
-        </div>
+        <img src="/hybridai.png" alt="HybridAI" className="hybrid-logo-img" />
         <h1 className="subtitle-1">Medical Chronology &amp; Analyzer Intelligence</h1>
         <h2 className="subtitle-2">We Make It Make Sense</h2>
       </div>
