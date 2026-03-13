@@ -1,39 +1,48 @@
 import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
+import { getCurrentUser } from "aws-amplify/auth";
+import AuroraBackground from "./components/AuroraBackground";
+import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
 
-const client = generateClient<Schema>();
+interface AuthUser {
+  username: string;
+  email: string;
+}
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
+    getCurrentUser()
+      .then((u) => setUser({ username: u.username, email: u.username }))
+      .catch(() => setUser(null))
+      .finally(() => setChecking(false));
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
+  const handleLogin = (u: AuthUser) => setUser(u);
+  const handleLogout = () => setUser(null);
+
+  if (checking) {
+    return (
+      <>
+        <AuroraBackground />
+        <div className="loading-screen">
+          <div className="loading-spinner" />
+        </div>
+      </>
+    );
   }
 
   return (
-    <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
-    </main>
+    <>
+      <AuroraBackground />
+      {user ? (
+        <Dashboard user={user} onLogout={handleLogout} />
+      ) : (
+        <Login onLogin={handleLogin} />
+      )}
+    </>
   );
 }
 
