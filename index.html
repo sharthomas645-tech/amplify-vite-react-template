@@ -1,53 +1,52 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>HybridAI Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurora Borealis HybridAI Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="dashboard.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Welcome to the HybridAI Dashboard</h1>
-        <nav>
-            <ul>
-                <li><a href="#metrics">Metrics</a></li>
-                <li><a href="#case-management">Case Management</a></li>
-                <li><a href="#timeline">Timeline</a></li>
-            </ul>
-        </nav>
-    </header>
-    <section id="login">
-        <h2>Login</h2>
+    <div class="login-page">
+        <h1>Login</h1>
         <form>
             <input type="text" placeholder="Username" required>
             <input type="password" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
-    </section>
-    <section id="metrics">
-        <h2>Metrics</h2>
-        <div class="metric">
-            <h3>Metric 1</h3>
-            <p>Data 1</p>
+    </div>
+
+    <div class="dashboard">
+        <nav class="dashboard-navigation">
+            <ul>
+                <li><a href="#metrics">Metrics</a></li>
+                <li><a href="#case-management">Case Management</a></li>
+                <li><a href="#timeline">Chronology Timeline</a></li>
+            </ul>
+        </nav>
+        <div class="metrics-bar">
+            <!-- Metrics content goes here -->
         </div>
-        <div class="metric">
-            <h3>Metric 2</h3>
-            <p>Data 2</p>
+        <div class="case-management-panel">
+            <h2>Case Management</h2>
+            <div class="filters">
+                <!-- Filters go here -->
+            </div>
+            <button>Upload PDF</button>
+            <button>Build Chronology</button>
+            <button>RN Review Request</button>
+            <button>Export File</button>
         </div>
-    </section>
-    <section id="case-management">
-        <h2>Case Management</h2>
-        <div>
-            <p>Manage your cases here.</p>
+        <div class="chronology-timeline">
+            <!-- Chronology timeline content goes here -->
         </div>
-    </section>
-    <section id="timeline">
-        <h2>Timeline</h2>
-        <div>
-            <p>View your timeline here.</p>
+        <div class="api-configuration-modal">
+            <!-- API Configuration Modal Content -->
         </div>
-    </section>
-    <footer>
-        <p>Copyright © 2026 HybridAI</p>
-    </footer>
+        <div class="toast-notifications">
+            <!-- Toast notifications go here -->
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
