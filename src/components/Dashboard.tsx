@@ -2,13 +2,14 @@ import { useState, type FC } from "react";
 import { signOut } from "aws-amplify/auth";
 
 type CaseType = "Personal Injury" | "Medical Malpractice" | "Birth Injury";
+type CaseStatus = "Uploaded" | "Processing" | "RN Review in Progress" | "Ready for Export";
 
 interface Case {
   id: string;
   patientName: string;
   caseType: CaseType;
   dateOpened: string;
-  status: "Active" | "Review" | "Closed";
+  status: CaseStatus;
   lastUpdated: string;
   events: number;
 }
@@ -24,7 +25,7 @@ const DEMO_CASES: Case[] = [
     patientName: "John A. Smith",
     caseType: "Personal Injury",
     dateOpened: "2024-01-15",
-    status: "Active",
+    status: "Ready for Export",
     lastUpdated: "2024-03-10",
     events: 12,
   },
@@ -33,7 +34,7 @@ const DEMO_CASES: Case[] = [
     patientName: "Maria L. Garcia",
     caseType: "Medical Malpractice",
     dateOpened: "2024-02-03",
-    status: "Review",
+    status: "RN Review in Progress",
     lastUpdated: "2024-03-08",
     events: 8,
   },
@@ -42,7 +43,7 @@ const DEMO_CASES: Case[] = [
     patientName: "Robert J. Thompson",
     caseType: "Birth Injury",
     dateOpened: "2023-11-20",
-    status: "Active",
+    status: "Processing",
     lastUpdated: "2024-03-12",
     events: 21,
   },
@@ -51,7 +52,7 @@ const DEMO_CASES: Case[] = [
     patientName: "Linda K. Patel",
     caseType: "Medical Malpractice",
     dateOpened: "2024-01-28",
-    status: "Closed",
+    status: "Uploaded",
     lastUpdated: "2024-02-28",
     events: 15,
   },
@@ -71,17 +72,25 @@ const caseTypeColors: Record<CaseType, string> = {
   "Birth Injury": "#38bdf8",
 };
 
-const statusColors: Record<string, string> = {
-  Active: "#22d3ee",
-  Review: "#a78bfa",
-  Closed: "#60a5fa",
+const statusConfig: Record<CaseStatus, { color: string; glow: string; icon: string }> = {
+  "Uploaded":               { color: "#60a5fa", glow: "rgba(96,165,250,0.45)",  icon: "📄" },
+  "Processing":             { color: "#a78bfa", glow: "rgba(167,139,250,0.45)", icon: "⚙️" },
+  "RN Review in Progress":  { color: "#f59e0b", glow: "rgba(245,158,11,0.45)",  icon: "🩺" },
+  "Ready for Export":       { color: "#22d3ee", glow: "rgba(34,211,238,0.45)",  icon: "✅" },
 };
 
 const CASE_TYPES: CaseType[] = ["Personal Injury", "Medical Malpractice", "Birth Injury"];
 
+const ACTION_BUTTONS: { label: string; icon: string; cls: string }[] = [
+  { label: "Upload PDF",        icon: "📤", cls: "action-btn action-upload"    },
+  { label: "Build Chronology",  icon: "🗂️", cls: "action-btn action-build"     },
+  { label: "RN Review Request", icon: "🩺", cls: "action-btn action-rn"        },
+  { label: "Export File",       icon: "📥", cls: "action-btn action-export"    },
+];
+
 const Dashboard: FC<DashboardProps> = ({ user, onLogout }) => {
   const [selectedCaseType, setSelectedCaseType] = useState<CaseType | "All">("All");
-  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
+  const [selectedCaseId, setSelectedCaseId] = useState<string>(DEMO_CASES[0].id);
 
   const handleLogout = async () => {
     await signOut();
@@ -93,11 +102,14 @@ const Dashboard: FC<DashboardProps> = ({ user, onLogout }) => {
       ? DEMO_CASES
       : DEMO_CASES.filter((c) => c.caseType === selectedCaseType);
 
+  const activeCase = DEMO_CASES.find((c) => c.id === selectedCaseId) ?? DEMO_CASES[0];
+
   const metrics = {
-    total: DEMO_CASES.length,
-    active: DEMO_CASES.filter((c) => c.status === "Active").length,
-    review: DEMO_CASES.filter((c) => c.status === "Review").length,
-    closed: DEMO_CASES.filter((c) => c.status === "Closed").length,
+    total:    DEMO_CASES.length,
+    uploaded: DEMO_CASES.filter((c) => c.status === "Uploaded").length,
+    processing: DEMO_CASES.filter((c) => c.status === "Processing").length,
+    rnReview: DEMO_CASES.filter((c) => c.status === "RN Review in Progress").length,
+    ready:    DEMO_CASES.filter((c) => c.status === "Ready for Export").length,
   };
 
   return (
@@ -119,15 +131,45 @@ const Dashboard: FC<DashboardProps> = ({ user, onLogout }) => {
       </nav>
 
       <div className="dashboard-body">
+
+        {/* Case Selector + Action Buttons Bar */}
+        <div className="top-controls">
+          <div className="case-selector-wrap">
+            <label className="case-selector-label" htmlFor="case-select">Active Case</label>
+            <select
+              id="case-select"
+              className="case-selector"
+              value={selectedCaseId}
+              onChange={(e) => setSelectedCaseId(e.target.value)}
+            >
+              {DEMO_CASES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.id} — {c.patientName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="action-buttons">
+            {ACTION_BUTTONS.map((btn) => (
+              <button key={btn.label} className={btn.cls}>
+                <span className="action-btn-icon">{btn.icon}</span>
+                <span className="action-btn-label">{btn.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Metrics Bar */}
         <div className="metrics-bar">
           {[
-            { label: "Total Cases", value: metrics.total, color: "#60a5fa" },
-            { label: "Active", value: metrics.active, color: "#22d3ee" },
-            { label: "In Review", value: metrics.review, color: "#a78bfa" },
-            { label: "Closed", value: metrics.closed, color: "#818cf8" },
+            { label: "Total Cases",           value: metrics.total,      color: "#60a5fa", glow: "rgba(96,165,250,0.35)"  },
+            { label: "Uploaded",              value: metrics.uploaded,   color: "#60a5fa", glow: "rgba(96,165,250,0.35)"  },
+            { label: "Processing",            value: metrics.processing, color: "#a78bfa", glow: "rgba(167,139,250,0.35)" },
+            { label: "RN Review in Progress", value: metrics.rnReview,   color: "#f59e0b", glow: "rgba(245,158,11,0.35)"  },
+            { label: "Ready for Export",      value: metrics.ready,      color: "#22d3ee", glow: "rgba(34,211,238,0.35)"  },
           ].map((m) => (
-            <div className="metric-card" key={m.label}>
+            <div className="metric-card" key={m.label} style={{ "--metric-glow": m.glow } as React.CSSProperties}>
               <span className="metric-value" style={{ color: m.color }}>{m.value}</span>
               <span className="metric-label">{m.label}</span>
             </div>
@@ -160,69 +202,80 @@ const Dashboard: FC<DashboardProps> = ({ user, onLogout }) => {
             </div>
 
             <div className="cases-list">
-              {filteredCases.map((c) => (
-                <div
-                  key={c.id}
-                  className={`case-card ${selectedCase?.id === c.id ? "selected" : ""}`}
-                  onClick={() => setSelectedCase(c)}
-                >
-                  <div className="case-card-top">
-                    <span className="case-id">{c.id}</span>
-                    <span
-                      className="case-status-badge"
-                      style={{ background: `${statusColors[c.status]}22`, color: statusColors[c.status], border: `1px solid ${statusColors[c.status]}44` }}
-                    >
-                      {c.status}
-                    </span>
+              {filteredCases.map((c) => {
+                const sc = statusConfig[c.status];
+                return (
+                  <div
+                    key={c.id}
+                    className={`case-card ${selectedCaseId === c.id ? "selected" : ""}`}
+                    onClick={() => setSelectedCaseId(c.id)}
+                  >
+                    <div className="case-card-top">
+                      <span className="case-id">{c.id}</span>
+                      <span
+                        className="case-status-badge"
+                        style={{
+                          background: `${sc.color}1a`,
+                          color: sc.color,
+                          border: `1px solid ${sc.color}44`,
+                          boxShadow: `0 0 8px ${sc.glow}`,
+                        }}
+                      >
+                        {sc.icon} {c.status}
+                      </span>
+                    </div>
+                    <div className="case-patient">{c.patientName}</div>
+                    <div className="case-meta">
+                      <span className="case-type-tag" style={{ color: caseTypeColors[c.caseType] }}>
+                        {c.caseType}
+                      </span>
+                      <span className="case-events">{c.events} events</span>
+                    </div>
+                    <div className="case-dates">
+                      <span>Opened: {c.dateOpened}</span>
+                      <span>Updated: {c.lastUpdated}</span>
+                    </div>
                   </div>
-                  <div className="case-patient">{c.patientName}</div>
-                  <div className="case-meta">
-                    <span
-                      className="case-type-tag"
-                      style={{ color: caseTypeColors[c.caseType] }}
-                    >
-                      {c.caseType}
-                    </span>
-                    <span className="case-events">{c.events} events</span>
-                  </div>
-                  <div className="case-dates">
-                    <span>Opened: {c.dateOpened}</span>
-                    <span>Updated: {c.lastUpdated}</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           {/* Right Panel - Timeline / Details */}
           <div className="timeline-panel">
-            {selectedCase ? (
-              <>
-                <div className="panel-header">
+            <div className="panel-header">
+              <div className="timeline-panel-top">
+                <div>
                   <h2 className="panel-title gradient-text-inline">
-                    Chronology Timeline — {selectedCase.id}
+                    Chronology Timeline — {activeCase.id}
                   </h2>
-                  <span className="case-patient-label">{selectedCase.patientName}</span>
+                  <span className="case-patient-label">{activeCase.patientName}</span>
                 </div>
-                <div className="timeline">
-                  {TIMELINE_EVENTS.map((ev, i) => (
-                    <div className="timeline-event" key={i}>
-                      <div className="timeline-dot" />
-                      <div className="timeline-line" />
-                      <div className="timeline-content">
-                        <span className="timeline-date">{ev.date}</span>
-                        <span className="timeline-label">{ev.label}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="timeline-placeholder">
-                <div className="placeholder-icon">📋</div>
-                <p className="placeholder-text">Select a case to view its chronology timeline</p>
+                <span
+                  className="case-status-badge case-status-lg"
+                  style={{
+                    background: `${statusConfig[activeCase.status].color}1a`,
+                    color: statusConfig[activeCase.status].color,
+                    border: `1px solid ${statusConfig[activeCase.status].color}44`,
+                    boxShadow: `0 0 12px ${statusConfig[activeCase.status].glow}`,
+                  }}
+                >
+                  {statusConfig[activeCase.status].icon} {activeCase.status}
+                </span>
               </div>
-            )}
+            </div>
+            <div className="timeline">
+              {TIMELINE_EVENTS.map((ev, i) => (
+                <div className="timeline-event" key={i}>
+                  <div className="timeline-dot" />
+                  <div className="timeline-line" />
+                  <div className="timeline-content">
+                    <span className="timeline-date">{ev.date}</span>
+                    <span className="timeline-label">{ev.label}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
